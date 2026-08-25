@@ -1,0 +1,10 @@
+{
+  "name": "@bidx/shared",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BidX shared library - logger, errors, constants, kafka producer",
+  "main": "index.js",
+  "dependencies": {
+    "kafkajs": "^2.2.4"
+  }
+}

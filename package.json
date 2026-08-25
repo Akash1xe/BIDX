@@ -1,0 +1,43 @@
+{
+  "name": "bidx",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BidX - Distributed Real-Time Digital Auction Platform",
+  "workspaces": [
+    "shared",
+    "user-service",
+    "api-gateway",
+    "auction-service",
+    "search-service",
+    "bidding-service",
+    "payment-service",
+    "notification-service",
+    "admin-service"
+  ],
+  "scripts": {
+    "dev:gateway": "npm run dev -w api-gateway",
+    "start:gateway": "npm start -w api-gateway",
+    "dev:user": "npm run dev -w user-service",
+    "start:user": "npm start -w user-service",
+    "dev:auction": "npm run dev -w auction-service",
+    "start:auction": "npm start -w auction-service",
+    "dev:search": "npm run dev -w search-service",
+    "start:search": "npm start -w search-service",
+    "dev:bidding": "npm run dev -w bidding-service",
+    "start:bidding": "npm start -w bidding-service",
+    "dev:payment": "npm run dev -w payment-service",
+    "start:payment": "npm start -w payment-service",
+    "dev:notification": "npm run dev -w notification-service",
+    "start:notification": "npm start -w notification-service",
+    "dev:admin": "npm run dev -w admin-service",
+    "start:admin": "npm start -w admin-service",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@bidx/admin-service",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@bidx/shared": "1.0.0",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0"
+  }
+}
