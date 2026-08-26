@@ -8,7 +8,7 @@ keeps all browser traffic on the API Gateway.
 | Route | Capability |
 | --- | --- |
 | `/seller` | Seller metrics and entry points |
-| `/seller/products` | Product contract status and creation entry point |
+| `/seller/products` | Searchable, paginated owned product inventory |
 | `/seller/products/create` | Create an owned product |
 | `/seller/auctions` | Paginated seller-owned auction management |
 | `/seller/auctions/create` | Create a DRAFT auction |
@@ -25,9 +25,8 @@ The create form sends the exact backend fields: `name`, `description`,
 `LIKE_NEW`, `USED`, and `REFURBISHED`.
 
 On success, the frontend displays the returned product ID and links to auction
-creation with that ID prefilled. This bridge is necessary because the current
-backend has no seller product-list endpoint. Refreshing the page does not claim
-that a complete product inventory is available.
+creation with that ID prefilled. `GET /products/mine` returns only products
+owned by the authenticated seller and supports search and pagination.
 
 ## Auction flow
 
@@ -51,4 +50,4 @@ are shown as backend messages rather than pretending a transition succeeded.
 Active and completed counts come from `GET /auctions?sellerId=<userId>`. Sold
 value sums `finalPrice` only for `SOLD` auctions. It is deliberately labelled
 sold value—not revenue—because verified payment revenue belongs to Phase 6.
-Product count remains unavailable until the backend adds product listing.
+Product count comes from the owned inventory pagination metadata.

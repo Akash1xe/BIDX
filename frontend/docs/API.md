@@ -81,6 +81,7 @@ Important behavior:
 | --- | --- | --- | --- | --- | --- |
 | GET | `/users/me` | Bearer | None | `{ user, fromCache }` | 401, 404 |
 | PUT | `/users/me` | Bearer | `{ name }` | `{ user }` | 400, 401, 404 |
+| POST | `/users/me/seller` | Bearer | None | `{ user, activated }` | 401, 403, 404 |
 
 Only `name` is currently editable.
 
@@ -89,6 +90,7 @@ Only `name` is currently editable.
 | Method | Endpoint | Auth | Request | Returns | Expected errors |
 | --- | --- | --- | --- | --- | --- |
 | POST | `/products` | SELLER/ADMIN | `{ name, description?, images?, category, condition? }` | Product | 400, 401, 403 |
+| GET | `/products/mine?page=&limit=&q=` | SELLER/ADMIN | None | `{ items, pagination }` | 401, 403 |
 | GET | `/products/:productId` | Optional bearer | None | Product | 404 |
 | DELETE | `/products/:productId` | Owner bearer | None | `{ removed: true }` | 401, 403, 404 |
 

@@ -21,24 +21,22 @@ The service also has no read/unread fields or mark-read mutation. Phase 7 keeps
 read IDs per authenticated user in device-local storage, so read state does not
 follow a user across browsers or devices.
 
-## 3. Product management cannot list seller products
+## 3. Seller product listing — resolved in seller contracts
 
-Product routes provide create, get-by-ID, and delete, but no list endpoint.
-The planned seller products page needs something like:
+The authenticated seller inventory endpoint is now:
 
 ```text
-GET /api/v1/products?sellerId=<current-user>&page=1&limit=20
+GET /api/v1/products/mine?page=1&limit=20&q=camera
 ```
 
-Phase 5 therefore provides real product creation and carries the returned
-product ID directly into auction creation, but intentionally does not render a
-fabricated inventory list. The Products page explains the missing contract.
+It derives the seller only from verified gateway identity, never a caller-owned
+query parameter. The frontend renders the real inventory and its pagination.
 
-## 4. New users cannot become sellers through an API
+## 4. Seller onboarding — resolved in seller contracts
 
-Signup creates role `USER`, and profile updates only allow `name`. No current
-endpoint requests, grants, or changes a seller role. Seller flows require seeded
-seller accounts until a role-onboarding or admin role-management endpoint exists.
+Verified users can call `POST /users/me/seller`. The operation is authenticated
+and idempotent, preserves buyer access, clears the profile cache, and requires a
+session refresh so the new access token contains the backend-issued role.
 
 ## 5. Auction history is a placeholder
 

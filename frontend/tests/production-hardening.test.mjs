@@ -33,6 +33,16 @@ test("session bootstrap supports an HttpOnly refresh cookie", async () => {
   assert.match(authApi, /refreshToken \? \{ refreshToken \} : \{\}/);
 });
 
+test("seller activation refreshes the role and inventory uses the owned endpoint", async () => {
+  const provider = await readFile(new URL("../providers/AuthProvider.js", import.meta.url), "utf8");
+  const authApi = await readFile(new URL("../features/auth/api.js", import.meta.url), "utf8");
+  const productsApi = await readFile(new URL("../features/products/api.js", import.meta.url), "utf8");
+  assert.match(authApi, /post\("\/users\/me\/seller"/);
+  assert.match(provider, /await authApi\.becomeSeller\(\);\s*await refresh\(\)/);
+  assert.match(productsApi, /get\("\/products\/mine"/);
+  assert.doesNotMatch(productsApi, /sellerId/);
+});
+
 test("API errors retain status and gateway request ID", () => {
   const error = normalizeApiError({
     response: { status: 429, data: {}, headers: { "x-request-id": "req-123" } },

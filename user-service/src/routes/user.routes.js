@@ -7,5 +7,6 @@ const router = express.Router();
 router.use("/me", requireAuth);
 router.get("/me", userController.getMe);
 router.put("/me", userController.updateMe);
+router.post("/me/seller", userController.becomeSeller);
 
 module.exports = router;

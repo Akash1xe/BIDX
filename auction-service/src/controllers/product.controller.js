@@ -3,9 +3,7 @@ const { asyncHandler } = require("../utils/async-handler.util");
 const productService = require("../services/product.service");
 
 function requireSeller(req) {
-  if (!req.user) {
-    throw ApiError.unauthorized("Authentication required");
-  }
+  if (!req.user) throw ApiError.unauthorized("Authentication required");
   if (req.user.role !== "SELLER" && req.user.role !== "ADMIN") {
     throw ApiError.forbidden("Requires SELLER role");
   }
@@ -24,15 +22,20 @@ const createProduct = asyncHandler(async (req, res) => {
     sellerId: req.user.id,
     name: name.trim(),
     description: typeof description === "string" ? description.trim() : undefined,
-    images: Array.isArray(images) ? images.filter((i) => typeof i === "string") : undefined,
+    images: Array.isArray(images) ? images.filter((image) => typeof image === "string") : undefined,
     category: category.trim().toLowerCase(),
     condition
   });
-  return ApiResponse.success(res, {
-    statusCode: 201,
-    message: "Product created",
-    data: product
-  });
+  return ApiResponse.success(res, { statusCode: 201, message: "Product created", data: product });
+});
+
+const listMyProducts = asyncHandler(async (req, res) => {
+  requireSeller(req);
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+  const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+  const result = await productService.listMine({ sellerId: req.user.id, page, limit, q });
+  return ApiResponse.success(res, { message: "Seller products fetched", data: result });
 });
 
 const getProduct = asyncHandler(async (req, res) => {
@@ -41,8 +44,9 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
+  requireSeller(req);
   const result = await productService.remove(req.params.productId, req.user.id);
   return ApiResponse.success(res, { message: "Product removed", data: result });
 });
 
-module.exports = { createProduct, getProduct, deleteProduct };
+module.exports = { createProduct, listMyProducts, getProduct, deleteProduct };

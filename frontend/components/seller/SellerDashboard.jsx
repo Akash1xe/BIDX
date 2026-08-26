@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuctions } from "@/features/auctions/hooks";
 import useAuth from "@/hooks/useAuth";
+import { useMyProducts } from "@/features/products/hooks";
 import { formatMoney } from "@/utils/auction";
 
 export default function SellerDashboard() {
   const { user } = useAuth();
   const query = useAuctions({ sellerId: user.id, page: 1, limit: 50 });
+  const productsQuery = useMyProducts({ page: 1, limit: 1 });
   const auctions = query.data?.items || [];
   const active = auctions.filter((item) => ["LIVE", "SCHEDULED"].includes(item.status)).length;
   const completed = auctions.filter((item) => ["ENDED", "SOLD", "UNSOLD", "PAYMENT_PENDING"].includes(item.status)).length;
@@ -20,7 +22,7 @@ export default function SellerDashboard() {
     <>
       <div className="seller-action-row"><Button asChild className="primary-button"><Link href="/seller/products/create"><Boxes /> Create product</Link></Button><Button asChild variant="outline"><Link href="/seller/auctions/create"><CalendarClock /> Create auction</Link></Button></div>
       <div className="seller-stats">
-        <article><Boxes /><span>Products</span><strong>—</strong><p>The backend still needs a seller product-list endpoint.</p></article>
+        <article><Boxes /><span>Products</span><strong>{productsQuery.isLoading ? <Skeleton className="seller-stat-skeleton" /> : productsQuery.data?.pagination?.total || 0}</strong><p>Owned product records ready for auction creation.</p></article>
         <article><Gavel /><span>Active auctions</span><strong>{query.isLoading ? <Skeleton className="seller-stat-skeleton" /> : active}</strong><p>Live and scheduled inventory.</p></article>
         <article><CalendarClock /><span>Completed</span><strong>{query.isLoading ? <Skeleton className="seller-stat-skeleton" /> : completed}</strong><p>Ended, sold, unsold, or awaiting payment.</p></article>
         <article><CircleDollarSign /><span>Sold value</span><strong>{query.isLoading ? <Skeleton className="seller-stat-skeleton" /> : formatMoney(soldValue)}</strong><p>Final prices for SOLD auctions; payment revenue arrives in Phase 6.</p></article>

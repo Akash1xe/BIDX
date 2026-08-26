@@ -1,6 +1,10 @@
 import { api } from "@/services/api-client";
 
 export const productsApi = {
+  listMine(params = {}) {
+    return api.get("/products/mine", { params });
+  },
+
   create(payload) {
     return api.post("/products", payload);
   },

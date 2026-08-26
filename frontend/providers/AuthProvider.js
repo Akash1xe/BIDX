@@ -121,6 +121,12 @@ export default function AuthProvider({ children }) {
     }
   }, [clearSession]);
 
+  const becomeSeller = useCallback(async () => {
+    await authApi.becomeSeller();
+    await refresh();
+    return sessionRef.current;
+  }, [refresh]);
+
   const value = useMemo(() => ({
     session,
     user: session?.user || null,
@@ -132,8 +138,9 @@ export default function AuthProvider({ children }) {
     completeSignup,
     resendOtp,
     refresh,
+    becomeSeller,
     logout,
-  }), [beginSignup, completeSignup, isLoading, login, logout, refresh, resendOtp, session, signupDraft]);
+  }), [becomeSeller, beginSignup, completeSignup, isLoading, login, logout, refresh, resendOtp, session, signupDraft]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
