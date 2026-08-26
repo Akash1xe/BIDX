@@ -86,3 +86,13 @@ test("demo mode removes Kafka and Elasticsearch startup dependencies", async () 
   assert.match(search, /AUCTION_SERVICE_URL|auctionServiceUrl/);
   assert.match(search, /mode: "demo"/);
 });
+
+test("gateway returns empty demo history when optional services are unavailable", async () => {
+  const env = await read("api-gateway/src/config/env.js");
+  const proxy = await read("api-gateway/src/middleware/proxy.middleware.js");
+  assert.match(env, /demoMode:/);
+  assert.match(proxy, /pathname === "\/api\/v1\/payments\/mine"/);
+  assert.match(proxy, /pathname === "\/api\/v1\/notifications\/mine"/);
+  assert.match(proxy, /X-BidX-Demo-Fallback/);
+  assert.match(proxy, /result\.status >= 500/);
+});

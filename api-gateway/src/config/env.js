@@ -22,6 +22,7 @@ const corsOrigins = (process.env.CORS_ORIGINS || "*").split(",").map((value) => 
 const env = {
   nodeEnv,
   isProduction: nodeEnv === "production",
+  demoMode: String(process.env.DEMO_MODE || "false").toLowerCase() === "true",
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "api-gateway",
   port: parseInt(process.env.PORT || required("GATEWAY_PORT", "4000"), 10),
