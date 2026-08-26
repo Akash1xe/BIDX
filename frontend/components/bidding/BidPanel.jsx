@@ -12,6 +12,7 @@ import { createBidSchema } from "@/features/bidding/schema";
 import { usePlaceBid } from "@/features/bidding/hooks";
 import useAuth from "@/hooks/useAuth";
 import { formatMoney } from "@/utils/auction";
+import { addDemoNotification } from "@/utils/demo-notifications";
 import { createIdempotencyKey } from "@/utils/idempotency";
 
 function errorCopy(error) {
@@ -42,6 +43,13 @@ export default function BidPanel({ auction, auctionId, minimum }) {
       });
       setSuccess(data);
       form.reset({ amount: "" });
+      addDemoNotification(user.id, {
+        eventId: `bid-accepted:${data.bid.id}`,
+        type: "BID_ACCEPTED",
+        auctionId,
+        subject: `Bid accepted at ${formatMoney(data.auction.currentBid)}`,
+        data: { amount: data.auction.currentBid },
+      });
       toast.success(data.replayed ? "Your earlier bid was safely replayed." : `Bid accepted at ${formatMoney(data.auction.currentBid)}.`);
     } catch {
       // The mutation exposes the normalized error below and refreshes auction state.

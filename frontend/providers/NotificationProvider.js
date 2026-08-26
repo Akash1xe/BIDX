@@ -4,6 +4,7 @@ import { createContext, useCallback, useEffect, useMemo, useRef, useState } from
 import { toast } from "sonner";
 import { useNotificationFeed } from "@/features/notifications/hooks";
 import useAuth from "@/hooks/useAuth";
+import { readDemoNotifications, subscribeDemoNotifications } from "@/utils/demo-notifications";
 import { notificationHref, notificationId, notificationSubject } from "@/utils/notification";
 
 export const NotificationContext = createContext(null);
@@ -23,12 +24,30 @@ export default function NotificationProvider({ children }) {
   const userId = user?.id || null;
   const query = useNotificationFeed(isAuthenticated ? userId : null);
   const [readIds, setReadIds] = useState(() => new Set());
+  const [demoItems, setDemoItems] = useState([]);
   const seenRef = useRef({ userId: null, ids: new Set() });
-  const items = useMemo(() => query.data || [], [query.data]);
+  const items = useMemo(() => {
+    const merged = [...demoItems, ...(query.data || [])];
+    const ids = new Set();
+    return merged
+      .filter((item) => {
+        const id = notificationId(item);
+        if (!id || ids.has(id)) return false;
+        ids.add(id);
+        return true;
+      })
+      .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+  }, [demoItems, query.data]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setReadIds(readStored(userId)), 0);
     return () => window.clearTimeout(timer);
+  }, [userId]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDemoItems(readDemoNotifications(userId)), 0);
+    const unsubscribe = subscribeDemoNotifications(userId, setDemoItems);
+    return () => { window.clearTimeout(timer); unsubscribe(); };
   }, [userId]);
 
   useEffect(() => {

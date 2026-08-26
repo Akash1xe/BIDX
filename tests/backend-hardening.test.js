@@ -113,3 +113,13 @@ test("payment startup logs never include MongoDB credentials", async () => {
   assert.match(db, /new URL\(uri\)\.host/);
   assert.doesNotMatch(db, /uri\.split\("\/\/"\)\[1\]/);
 });
+
+test("frontend records demo auction and payment notifications without Kafka", async () => {
+  const provider = await read("frontend/providers/NotificationProvider.js");
+  const payment = await read("frontend/components/payment/PaymentCheckout.jsx");
+  const bidding = await read("frontend/components/bidding/BidPanel.jsx");
+  assert.match(provider, /subscribeDemoNotifications/);
+  assert.match(payment, /type: "WINNER"/);
+  assert.match(payment, /type: "PAYMENT_RECEIPT"/);
+  assert.match(bidding, /type: "BID_ACCEPTED"/);
+});
