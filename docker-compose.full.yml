@@ -1,0 +1,142 @@
+x-service-env: &service-env
+  NODE_ENV: production
+  LOG_LEVEL: info
+  KAFKA_BROKERS: kafka:29092
+  REDIS_URL: redis://redis:6379
+  MONGODB_URI_USERS: mongodb://mongodb:27017/bidx_users
+  MONGODB_URI_AUCTIONS: mongodb://mongodb:27017/bidx_auctions
+  MONGODB_URI_BIDS: mongodb://mongodb:27017/bidx_bids
+  MONGODB_URI_PAYMENTS: mongodb://mongodb:27017/bidx_payments
+  MONGODB_URI_NOTIFICATIONS: mongodb://mongodb:27017/bidx_notifications
+  MONGODB_URI_ADMIN: mongodb://mongodb:27017/bidx_admin
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}
+  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+
+x-service-dependencies: &service-dependencies
+  mongodb:
+    condition: service_healthy
+  redis:
+    condition: service_healthy
+  kafka:
+    condition: service_healthy
+
+services:
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      USER_SERVICE_PORT: 4001
+    depends_on: *service-dependencies
+
+  auction-service:
+    build:
+      context: .
+      dockerfile: auction-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      AUCTION_SERVICE_PORT: 4002
+    depends_on: *service-dependencies
+
+  search-service:
+    build:
+      context: .
+      dockerfile: search-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      SEARCH_SERVICE_PORT: 4003
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+    depends_on:
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
+  bidding-service:
+    build:
+      context: .
+      dockerfile: bidding-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      BIDDING_SERVICE_PORT: 4004
+    depends_on: *service-dependencies
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      PAYMENT_SERVICE_PORT: 4005
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:?RAZORPAY_WEBHOOK_SECRET is required}
+    depends_on: *service-dependencies
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      NOTIFICATION_SERVICE_PORT: 4006
+      EMAIL_MODE: dev
+    depends_on: *service-dependencies
+
+  admin-service:
+    build:
+      context: .
+      dockerfile: admin-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *service-env
+      ADMIN_SERVICE_PORT: 4007
+    depends_on: *service-dependencies
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      <<: *service-env
+      GATEWAY_PORT: 4000
+      CORS_ORIGINS: ${FRONTEND_ORIGIN:-http://localhost:3000}
+      USER_SERVICE_URL: http://user-service:4001
+      AUCTION_SERVICE_URL: http://auction-service:4002
+      SEARCH_SERVICE_URL: http://search-service:4003
+      BIDDING_SERVICE_URL: http://bidding-service:4004
+      PAYMENT_SERVICE_URL: http://payment-service:4005
+      NOTIFICATION_SERVICE_URL: http://notification-service:4006
+      ADMIN_SERVICE_URL: http://admin-service:4007
+    depends_on:
+      - user-service
+      - auction-service
+      - search-service
+      - bidding-service
+      - payment-service
+      - notification-service
+      - admin-service
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+        NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
+        NEXT_PUBLIC_RAZORPAY_KEY_ID: ${NEXT_PUBLIC_RAZORPAY_KEY_ID:-}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway

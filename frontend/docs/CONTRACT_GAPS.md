@@ -34,6 +34,14 @@ for another user's notification records.
 Required backend fix: protect `/notifications/mine` at the gateway and derive
 the user only from the verified `x-user-id` identity header.
 
+Phase 7 passes only the current authenticated session's user ID, but this is a
+frontend safety measure rather than authorization. The backend vulnerability
+remains until the gateway and service enforce identity.
+
+The service also has no read/unread fields or mark-read mutation. Phase 7 keeps
+read IDs per authenticated user in device-local storage, so read state does not
+follow a user across browsers or devices.
+
 ## 3. Product management cannot list seller products
 
 Product routes provide create, get-by-ID, and delete, but no list endpoint.
@@ -66,6 +74,10 @@ emit `AUCTION_STARTED`, `AUCTION_ENDED`, payment, or generic notification events
 Those UI states must initially use query invalidation/polling unless the backend
 adds corresponding socket events.
 
+Phase 7 polls the notification feed every 15 seconds. The first response is a
+silent baseline; only later records create toasts. `OUTBID` records are excluded
+because the existing `bid:outbid` socket handler already alerts the browser.
+
 ## 7. Razorpay webhook raw-body handling needs verification
 
 The gateway parses JSON and reserializes request bodies while Razorpay signature
@@ -95,10 +107,11 @@ back to `NEXT_PUBLIC_RAZORPAY_KEY_ID`; configure it for reliable checkout resume
 ## 8. The backend cannot issue an HttpOnly refresh-token cookie
 
 The backend returns both access and refresh tokens in JSON request bodies. The
-Phase 2 frontend keeps the current session in one encapsulated browser-storage
-module because the backend requires the refresh token in the `/auth/refresh`
-request body. This is compatible with the current contract but exposes tokens
-to JavaScript if an XSS vulnerability exists.
+frontend keeps access tokens only in memory, but still persists the refresh
+token in one encapsulated browser-storage module because the backend requires
+it in the `/auth/refresh` request body. This is compatible with the current
+contract but leaves the long-lived refresh credential exposed to JavaScript if
+an XSS vulnerability exists.
 
 Preferred production improvement: issue and rotate the refresh token through a
 `Secure`, `HttpOnly`, `SameSite` cookie, keep the access token in memory, and add
@@ -112,3 +125,24 @@ function is implemented. A Google button is intentionally not shown yet because
 the repository does not define the required public Google client ID or browser
 identity-provider initialization. Add that configuration before enabling the UI;
 never fabricate an ID token in the browser.
+
+## 12. Admin statistics have no time-series data
+
+`GET /admin/stats` returns current aggregate counts and GMV only. It does not
+return dated buckets for users, auctions, bids, payments, or revenue. Phase 8
+shows exact totals and derived current ratios instead of fabricating charts.
+Add time-bucketed aggregation parameters or dedicated analytics endpoints before
+building trend charts.
+
+## 13. Admin audit records do not include request context
+
+The current audit schema records actor, action, target, details, and time. It has
+no IP address, request ID, result, or failure record. The Phase 8 audit table
+therefore displays only verified stored fields.
+
+## 14. The backend permits an admin to suspend itself
+
+The suspension controller does not reject an actor targeting its own user ID.
+The Phase 8 UI hides this action for the current admin to reduce accidental
+lockout, but the backend must enforce this rule because frontend checks can be
+bypassed.

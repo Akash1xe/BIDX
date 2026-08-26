@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Gavel, LogOut, Menu, Search, Store, X } from "lucide-react";
+import { Gavel, LogOut, Menu, Search, Store, X } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
+import NotificationBell from "@/components/notification/NotificationBell";
 
 export default function PublicHeader() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function PublicHeader() {
         <div className="header-actions">
           {isAuthenticated ? (
             <div className="session-actions">
-              <button className="icon-button" aria-label="Notifications"><Bell size={17} /></button>
+              <NotificationBell />
               <button className="profile-pill" onClick={() => router.push("/dashboard")}>
                 <span>{user.name.slice(0, 1).toUpperCase()}</span>{user.name}
               </button>
@@ -52,4 +53,3 @@ export default function PublicHeader() {
     </header>
   );
 }
-

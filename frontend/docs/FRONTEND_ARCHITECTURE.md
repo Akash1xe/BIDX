@@ -47,9 +47,15 @@ public/       Static assets
   lifecycle management — complete.
 - **Phase 6:** winner checkout, Razorpay confirmation, payment status and
   participant history — complete.
-- **Phase 7+:** notifications, admin and production.
+- **Phase 7:** notification center, unread indicators and delivery alerts —
+  complete.
+- **Phase 8:** admin statistics, user moderation, auction inspection and audit
+  history — complete.
+- **Phase 9:** session and response security, recovery states, containers,
+  production checks, deployment guidance and release gates — complete.
 
-Do not create business feature modules before their phase begins.
+All planned frontend phases are complete. Remaining launch work is backend
+contract hardening and an authenticated staging run with seeded role accounts.
 
 ## Phase 4 server-state flow
 
@@ -58,3 +64,15 @@ mutation, the backend completes its lock/OCC/database flow, and only the
 successful response updates React Query. Socket events update the same cache for
 other connected clients. A 15-second auction/history refresh remains active as a
 fallback while the gateway WebSocket gap is unresolved.
+
+## Phase 7 notification-state flow
+
+`NotificationProvider` owns the current user's delivery feed and unread count.
+It polls `GET /notifications/mine` every 15 seconds because the backend does not
+emit notification socket events. The first successful response establishes a
+baseline; later unseen records produce a toast. `OUTBID` records do not produce
+a second toast because `RealtimeProvider` already handles `bid:outbid`.
+
+The Notification Service stores email-delivery records, not in-app read state.
+Read IDs are persisted per user on the current device behind the provider. That
+keeps a future migration to server-backed read state contained.
