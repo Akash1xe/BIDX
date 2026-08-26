@@ -1,37 +1,25 @@
 const express = require("express");
 const notificationService = require("../services/notification.service");
 const asyncHandler = require("../utils/async-handler.util");
+const { requireIdentity, requireAdmin } = require("../middleware/identity.middleware");
 
 const router = express.Router();
+router.use(requireIdentity);
 
-router.get(
-  "/mine",
-  asyncHandler(async (req, res) => {
-    const userId = req.query.userId || req.headers["x-user-id"];
-    if (!userId) {
-      return res.status(400).json({ success: false, error: "userId required" });
-    }
-    const limit = Math.min(Number(req.query.limit) || 20, 100);
-    const offset = Number(req.query.offset) || 0;
-    const items = await notificationService.listByUser(userId, { limit, offset });
-    res.json({ success: true, data: items });
-  })
-);
+router.get("/mine", asyncHandler(async (req, res) => {
+  const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 100);
+  const offset = Math.max(Number(req.query.offset) || 0, 0);
+  const items = await notificationService.listByUser(req.user.id, { limit, offset });
+  res.json({ success: true, data: items });
+}));
 
-router.get(
-  "/auction/:auctionId",
-  asyncHandler(async (req, res) => {
-    const items = await notificationService.listByAuction(req.params.auctionId);
-    res.json({ success: true, data: items });
-  })
-);
+router.get("/auction/:auctionId", requireAdmin, asyncHandler(async (req, res) => {
+  const items = await notificationService.listByAuction(req.params.auctionId);
+  res.json({ success: true, data: items });
+}));
 
-router.get(
-  "/stats",
-  asyncHandler(async (req, res) => {
-    const stats = await notificationService.stats();
-    res.json({ success: true, data: stats });
-  })
-);
+router.get("/stats", requireAdmin, asyncHandler(async (_req, res) => {
+  res.json({ success: true, data: await notificationService.stats() });
+}));
 
 module.exports = router;
