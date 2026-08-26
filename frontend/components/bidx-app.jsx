@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Bell,
@@ -34,6 +35,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Toaster } from "@/components/ui/sonner";
 import { api, API_URL, SOCKET_URL, makeIdempotencyKey, readSession, saveSession } from "@/lib/bidx-api";
 import { DEMO_AUCTIONS, DEMO_BIDS } from "@/lib/demo-data";
+import useAuth from "@/hooks/useAuth";
 
 const CATEGORIES = ["All", "Cameras", "Watches", "Design", "Collectibles"];
 
@@ -267,9 +269,9 @@ function AdminView() {
 }
 
 export default function BidXApp() {
+  const router = useRouter();
+  const { session, logout: logoutSession } = useAuth();
   const socketRef = useRef(null);
-  const [session, setSession] = useState(null);
-  const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -280,7 +282,6 @@ export default function BidXApp() {
   const [source, setSource] = useState("loading");
 
   useEffect(() => {
-    setSession(readSession());
     let active = true;
     async function load() {
       try {
@@ -343,10 +344,9 @@ export default function BidXApp() {
     return (!query || product.name?.toLowerCase().includes(query.toLowerCase())) && (category === "All" || product.category?.toLowerCase() === category.toLowerCase());
   }), [auctions, query, category]);
 
-  function logout() {
-    const refreshToken = session?.tokens?.refreshToken;
-    if (refreshToken) api("/api/v1/auth/logout", { method: "POST", body: { refreshToken } }).catch(() => {});
-    saveSession(null); setSession(null); toast.success("Signed out");
+  async function logout() {
+    await logoutSession();
+    toast.success("Signed out");
   }
 
   function handleBidPlaced(data) {
@@ -358,7 +358,7 @@ export default function BidXApp() {
   return (
     <main>
       <Toaster position="top-right" />
-      <header className="site-header"><div className="header-inner"><Brand /><nav className={menuOpen ? "nav-open" : ""}><a href="#market" onClick={() => setMenuOpen(false)}>Discover</a><a href="#how" onClick={() => setMenuOpen(false)}>How it works</a><a href="#dashboard" onClick={() => setMenuOpen(false)}>My activity</a></nav><div className="header-actions"><button className="icon-button" aria-label="Notifications"><Bell size={18} /></button>{session ? <div className="session-actions"><button className="profile-pill"><span>{session.user.name.slice(0, 1)}</span>{session.user.name}<ChevronDown size={14} /></button><button className="icon-button" onClick={logout} aria-label="Sign out"><LogOut size={17} /></button></div> : <><Button variant="ghost" onClick={() => setAuthOpen(true)}>Sign in</Button><Button className="primary-button" onClick={() => setAuthOpen(true)}>Start bidding</Button></>}<button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X /> : <Menu />}</button></div></div></header>
+      <header className="site-header"><div className="header-inner"><Brand /><nav className={menuOpen ? "nav-open" : ""}><a href="#market" onClick={() => setMenuOpen(false)}>Discover</a><a href="#how" onClick={() => setMenuOpen(false)}>How it works</a><a href={session ? "/dashboard" : "/login?next=/dashboard"} onClick={() => setMenuOpen(false)}>My activity</a></nav><div className="header-actions"><button className="icon-button" aria-label="Notifications"><Bell size={18} /></button>{session ? <div className="session-actions"><button className="profile-pill" onClick={() => router.push("/dashboard")}><span>{session.user.name.slice(0, 1)}</span>{session.user.name}<ChevronDown size={14} /></button><button className="icon-button" onClick={logout} aria-label="Sign out"><LogOut size={17} /></button></div> : <><Button variant="ghost" onClick={() => router.push("/login")}>Sign in</Button><Button className="primary-button" onClick={() => router.push("/signup")}>Start bidding</Button></>}<button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X /> : <Menu />}</button></div></div></header>
 
       <section className="hero" id="market"><div className="hero-copy"><Badge className="hero-badge"><Sparkles size={14} /> Live, verified, yours</Badge><h1>Bid on things<br />worth <em>keeping.</em></h1><p>A focused marketplace for remarkable objects. Real-time bids, verified sellers, and protected payments—without the noise.</p><div className="hero-search"><Search size={19} /><Input aria-label="Search auctions" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search cameras, watches, design…" /><Button className="primary-button" onClick={() => document.querySelector(".auction-grid")?.scrollIntoView({ behavior: "smooth" })}>Explore</Button></div><div className="trust-row"><span><Check /> Verified sellers</span><span><Check /> Real-time bidding</span><span><Check /> Secure payments</span></div></div><div className="hero-visual"><div className="lot-card"><div className="lot-top"><span>LOT 042</span><Badge className="status-live"><span className="live-dot" /> LIVE</Badge></div><div className="lot-gavel"><Gavel /></div><div className="lot-bottom"><div><span>Current bid</span><strong>{money(142500)}</strong></div><div><span>Ending in</span><strong>43:18</strong></div></div></div><div className="floating-bid"><span className="avatar-dot">A</span><div><strong>New bid placed</strong><span>{money(142500)} · just now</span></div></div></div></section>
 
@@ -366,12 +366,11 @@ export default function BidXApp() {
 
       <section className="how-section" id="how"><div className="how-intro"><p className="eyebrow">Built for confidence</p><h2>From first look<br />to final bid.</h2><p>BidX keeps the complex distributed systems underneath the interface—so each action feels immediate and dependable.</p></div><div className="how-list"><div><span>01</span><div><Search /><h3>Discover</h3><p>Search by name, category, condition, price, and auction status.</p></div></div><div><span>02</span><div><Gavel /><h3>Bid live</h3><p>Every bid is concurrency-safe, idempotent, and streamed in real time.</p></div></div><div><span>03</span><div><ShieldCheck /><h3>Pay securely</h3><p>Winners complete protected Razorpay checkout and receive confirmation.</p></div></div></div></section>
 
-      <AccountView session={session} bids={session ? bids : []} auctions={auctions} onCreate={() => session ? setCreateOpen(true) : setAuthOpen(true)} />
+      <AccountView session={session} bids={session ? bids : []} auctions={auctions} onCreate={() => session ? router.push("/seller") : router.push("/login?next=/seller")} />
       {session?.user?.role === "ADMIN" && <AdminView />}
 
       <footer><Brand /><p>Distributed systems. Delightfully simple auctions.</p><span>© 2026 BidX</span></footer>
-      <AuthPanel open={authOpen} onOpenChange={setAuthOpen} onAuthenticated={setSession} />
-      <AuctionDialog auction={selected} open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)} session={session} onRequireAuth={() => setAuthOpen(true)} onBidPlaced={handleBidPlaced} />
+      <AuctionDialog auction={selected} open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)} session={session} onRequireAuth={() => router.push("/login?next=/")} onBidPlaced={handleBidPlaced} />
       <CreateAuctionDialog open={createOpen} onOpenChange={setCreateOpen} />
     </main>
   );
