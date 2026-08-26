@@ -10,11 +10,34 @@ const { selectGateway } = require("../adapters/payment-gateway.adapter");
 const gateway = selectGateway();
 
 async function safePublish(topic, data, key) {
+  if (env.demoMode) return;
   try {
     await publisher.publish(topic, data, { key });
   } catch (err) {
     logger.error(`Event publish failed for ${topic}: ${err.message}`);
   }
+}
+
+async function fetchDemoWinner(auctionId) {
+  const baseUrl = env.auctionServiceUrl.replace(/\/$/, "");
+  let response;
+  try {
+    response = await fetch(`${baseUrl}/api/v1/auctions/${auctionId}`);
+  } catch (error) {
+    throw ApiError.serviceUnavailable(`Auction Service is unavailable: ${error.message}`);
+  }
+  if (!response.ok) throw ApiError.notFound("Auction not found");
+  const payload = await response.json();
+  const auction = payload?.data;
+  if (!auction?.winningBidderId || !auction?.sellerId || !Number(auction?.finalPrice)) {
+    throw ApiError.notFound("No completed winning auction found");
+  }
+  return {
+    auctionId,
+    winnerId: String(auction.winningBidderId),
+    sellerId: String(auction.sellerId),
+    finalPrice: Number(auction.finalPrice)
+  };
 }
 
 function models() {
@@ -29,7 +52,8 @@ class PaymentService {
   async createOrder(user, auctionId) {
     const { Payment, AuctionWinner } = models();
 
-    const win = await AuctionWinner.findOne({ auctionId });
+    let win = await AuctionWinner.findOne({ auctionId });
+    if (!win && env.demoMode) win = await fetchDemoWinner(auctionId);
     if (!win || win.winnerId !== user.id) {
       throw ApiError.notFound("No won auction found for this user and auction");
     }
@@ -91,11 +115,15 @@ class PaymentService {
       throw ApiError.forbidden("You are not the winner on this order");
     }
 
-    if (!gateway.verifyCheckoutSignature(orderId, paymentId, signature)) {
+    const demoConfirmation = env.demoMode && gateway.mode === "dev";
+    if (!demoConfirmation && !gateway.verifyCheckoutSignature(orderId, paymentId, signature)) {
       throw ApiError.badRequest("Invalid checkout signature");
     }
 
-    return this.markPaid(payment, { providerPaymentId: paymentId, source: "checkout" });
+    return this.markPaid(payment, {
+      providerPaymentId: demoConfirmation ? `pay_demo_${Date.now()}` : paymentId,
+      source: demoConfirmation ? "demo-checkout" : "checkout"
+    });
   }
 
   async handleWebhook(rawBody, signature) {

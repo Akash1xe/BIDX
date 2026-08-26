@@ -36,6 +36,7 @@ const env = {
   port: parseInt(process.env.PORT || required("PAYMENT_SERVICE_PORT", "4005"), 10),
 
   mongoUri: required("MONGODB_URI_PAYMENTS", "mongodb://localhost:27017/bidx_payments"),
+  auctionServiceUrl: required("AUCTION_SERVICE_URL", "http://localhost:4002"),
 
   kafka: {
     brokers: (process.env.KAFKA_BROKERS || "localhost:9092").split(","),

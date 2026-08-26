@@ -42,7 +42,8 @@ export default function PaymentCheckout() {
         return;
       }
       if (order.mode !== "live") {
-        setCheckoutError("The backend created a development-mode order, but it does not expose a signed mock-confirmation endpoint. BidX will not forge a payment signature in the browser.");
+        await confirmPayment.mutateAsync({ orderId: order.orderId });
+        toast.success("Demo payment completed.");
         return;
       }
       const key = order.keyIdForCheckout || env.razorpayKeyId;
@@ -115,7 +116,7 @@ export default function PaymentCheckout() {
         {isSeller && !isWinner && !payment && noPaymentYet && <div className="payment-pending"><ReceiptText /><div><strong>No payment order yet</strong><p>The winner has not started checkout.</p></div></div>}
         {checkoutError && <div className="payment-warning"><AlertTriangle />{checkoutError}</div>}
       </section>
-      <aside className="payment-security-card"><ShieldCheck /><h3>Backend-authoritative checkout</h3><ol><li>The winner requests an order from BidX.</li><li>Razorpay collects payment details securely.</li><li>BidX verifies the signed Razorpay response.</li><li>Only then does this screen show PAID.</li></ol><p>No card or UPI details pass through this frontend.</p></aside>
+      <aside className="payment-security-card"><ShieldCheck /><h3>Backend-authoritative checkout</h3><ol><li>The winner requests an order from BidX.</li><li>Demo mode confirms it without charging money.</li><li>Live mode uses Razorpay and verifies its signed response.</li><li>Only then does this screen show PAID.</li></ol><p>No card or UPI details pass through this frontend.</p></aside>
     </div>
   );
 }

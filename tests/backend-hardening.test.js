@@ -96,3 +96,14 @@ test("gateway returns empty demo history when optional services are unavailable"
   assert.match(proxy, /X-BidX-Demo-Fallback/);
   assert.match(proxy, /result\.status >= 500/);
 });
+
+test("demo payments resolve winners from the Auction Service and require no browser-forged signature", async () => {
+  const payment = await read("payment-service/src/services/payment.service.js");
+  const frontend = await read("frontend/components/payment/PaymentCheckout.jsx");
+  assert.match(payment, /fetchDemoWinner/);
+  assert.match(payment, /env\.auctionServiceUrl/);
+  assert.match(payment, /demoConfirmation/);
+  assert.match(payment, /source: demoConfirmation \? "demo-checkout"/);
+  assert.match(frontend, /confirmPayment\.mutateAsync\(\{ orderId: order\.orderId \}\)/);
+  assert.doesNotMatch(frontend, /does not expose a signed mock-confirmation endpoint/);
+});
