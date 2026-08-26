@@ -18,6 +18,12 @@ Before real-time bidding, either:
 
 The frontend foundation uses option 1 as the intended architecture.
 
+Phase 4 is implemented against the gateway URL and visibly reports `REST refresh
+active` when the Socket.IO handshake is unavailable. Auction details and bid
+history poll every 15 seconds, so confirmed state still converges without asking
+the browser to call port `4004` directly. True push updates require the gateway
+fix above.
+
 ## 2. Notification identity is not protected
 
 The gateway marks `/api/v1/notifications` as unauthenticated and clears identity
@@ -83,4 +89,3 @@ function is implemented. A Google button is intentionally not shown yet because
 the repository does not define the required public Google client ID or browser
 identity-provider initialization. Add that configuration before enabling the UI;
 never fabricate an ID token in the browser.
-

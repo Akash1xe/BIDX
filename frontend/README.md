@@ -34,6 +34,16 @@ Phase 3 — Marketplace (complete):
 - shared skeleton, empty, gateway-error, and retry states;
 - legacy demo auction data and duplicate fetch client removed.
 
+Phase 4 — Real-time bidding (complete):
+
+- backend-confirmed bid placement with React Hook Form and dynamic Zod validation;
+- a unique idempotency key on every bid attempt;
+- explicit conflict, lock-contention, and authorization recovery states;
+- authenticated auction bid history and protected My Bids workspace;
+- Socket.IO auction-room join/leave, live cache updates, and outbid alerts;
+- auction and bid-history polling fallback while gateway WebSocket proxying is pending;
+- no optimistic bid success—the backend remains authoritative.
+
 ## Local setup
 
 ```bash
@@ -73,6 +83,7 @@ Read:
 - [Backend contract gaps](docs/CONTRACT_GAPS.md)
 - [Authentication architecture](docs/AUTHENTICATION.md)
 - [Marketplace architecture](docs/MARKETPLACE.md)
+- [Bidding architecture](docs/BIDDING.md)
 
 ## Important rule
 

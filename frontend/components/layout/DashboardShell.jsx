@@ -8,13 +8,18 @@ import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/useAuth";
 
 const roleLinks = {
-  USER: [{ href: "/dashboard", label: "My dashboard", icon: UserRound }],
+  USER: [
+    { href: "/dashboard", label: "My dashboard", icon: UserRound },
+    { href: "/dashboard/bids", label: "My bids", icon: Gavel },
+  ],
   SELLER: [
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
+    { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/seller", label: "Seller studio", icon: Store },
   ],
   ADMIN: [
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
+    { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/seller", label: "Seller studio", icon: Store },
     { href: "/admin", label: "Admin", icon: ShieldCheck },
   ],
@@ -56,4 +61,3 @@ export default function DashboardShell({ eyebrow, title, description, children }
     </main>
   );
 }
-

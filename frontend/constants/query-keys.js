@@ -1,7 +1,7 @@
 export const queryKeys = Object.freeze({
   auctions: (filters = {}) => ["auctions", filters],
   auction: (auctionId) => ["auction", auctionId],
-  auctionBids: (auctionId) => ["auction-bids", auctionId],
+  auctionBids: (auctionId, page = 1) => ["auction-bids", auctionId, page],
   myBids: (page = 1) => ["my-bids", page],
   search: (params = {}) => ["search", params],
   suggestions: (query) => ["search-suggestions", query],
@@ -14,4 +14,3 @@ export const queryKeys = Object.freeze({
   adminStats: ["admin-stats"],
   adminAudit: (params = {}) => ["admin-audit", params],
 });
-
