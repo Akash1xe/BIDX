@@ -124,3 +124,24 @@ function is implemented. A Google button is intentionally not shown yet because
 the repository does not define the required public Google client ID or browser
 identity-provider initialization. Add that configuration before enabling the UI;
 never fabricate an ID token in the browser.
+
+## 12. Admin statistics have no time-series data
+
+`GET /admin/stats` returns current aggregate counts and GMV only. It does not
+return dated buckets for users, auctions, bids, payments, or revenue. Phase 8
+shows exact totals and derived current ratios instead of fabricating charts.
+Add time-bucketed aggregation parameters or dedicated analytics endpoints before
+building trend charts.
+
+## 13. Admin audit records do not include request context
+
+The current audit schema records actor, action, target, details, and time. It has
+no IP address, request ID, result, or failure record. The Phase 8 audit table
+therefore displays only verified stored fields.
+
+## 14. The backend permits an admin to suspend itself
+
+The suspension controller does not reject an actor targeting its own user ID.
+The Phase 8 UI hides this action for the current admin to reduce accidental
+lockout, but the backend must enforce this rule because frontend checks can be
+bypassed.

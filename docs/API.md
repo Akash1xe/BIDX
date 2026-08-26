@@ -263,6 +263,11 @@ Every admin route requires a valid bearer token with role `ADMIN`.
 Admin statistics fields are `users`, `sellers`, `suspendedUsers`, `auctions`,
 `liveAuctions`, `soldAuctions`, `bids`, `paidPayments`, and `gmvMinor`.
 
+Admin user and auction lists return raw MongoDB records with `_id`, rather than
+the public-domain `id` shape. User records exclude `password` and `otpHash`.
+Audit records contain `_id`, `actorId`, `action`, optional `targetType`, optional
+`targetId`, `details`, and `createdAt`.
+
 ## Socket.IO contract
 
 The Bidding Service hosts Socket.IO at path `/socket.io`. The handshake requires

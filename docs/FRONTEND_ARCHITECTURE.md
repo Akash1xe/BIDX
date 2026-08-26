@@ -49,7 +49,9 @@ public/       Static assets
   participant history — complete.
 - **Phase 7:** notification center, unread indicators and delivery alerts —
   complete.
-- **Phase 8+:** admin and production.
+- **Phase 8:** admin statistics, user moderation, auction inspection and audit
+  history — complete.
+- **Phase 9+:** production hardening and deployment.
 
 Do not create business feature modules before their phase begins.
 
