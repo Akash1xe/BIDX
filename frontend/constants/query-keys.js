@@ -1,0 +1,17 @@
+export const queryKeys = Object.freeze({
+  auctions: (filters = {}) => ["auctions", filters],
+  auction: (auctionId) => ["auction", auctionId],
+  auctionBids: (auctionId) => ["auction-bids", auctionId],
+  myBids: (page = 1) => ["my-bids", page],
+  search: (params = {}) => ["search", params],
+  suggestions: (query) => ["search-suggestions", query],
+  payments: (page = 1) => ["payments", page],
+  payment: (auctionId) => ["payment", auctionId],
+  profile: ["profile"],
+  notifications: (params = {}) => ["notifications", params],
+  adminUsers: (params = {}) => ["admin-users", params],
+  adminAuctions: (params = {}) => ["admin-auctions", params],
+  adminStats: ["admin-stats"],
+  adminAudit: (params = {}) => ["admin-audit", params],
+});
+

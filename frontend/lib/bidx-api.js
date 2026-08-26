@@ -1,10 +1,14 @@
 const DEFAULT_API_URL = "http://localhost:4000";
 
 export const API_URL =
-  process.env.NEXT_PUBLIC_BIDX_API_URL || DEFAULT_API_URL;
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/v1\/?$/, "") ||
+  process.env.NEXT_PUBLIC_BIDX_API_URL ||
+  DEFAULT_API_URL;
 
 export const SOCKET_URL =
-  process.env.NEXT_PUBLIC_BIDX_SOCKET_URL || "http://localhost:4004";
+  process.env.NEXT_PUBLIC_SOCKET_URL ||
+  process.env.NEXT_PUBLIC_BIDX_SOCKET_URL ||
+  "http://localhost:4000";
 
 const STORAGE_KEY = "bidx-session";
 

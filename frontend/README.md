@@ -1,1 +1,61 @@
-# BidX Frontend\n\nNext.js App Router frontend for the BidX microservices backend.\n\n```bash\ncp .env.example .env.local\nnpm install\nnpm run dev\n```\n\nThe API Gateway defaults to `http://localhost:4000`; authenticated Socket.IO bidding connects directly to the Bidding Service on `http://localhost:4004`.\n
+# BidX Frontend
+
+Next.js App Router frontend for the BidX distributed auction platform.
+
+## Phase status
+
+Phase 1 — Foundation:
+
+- frontend dependencies installed;
+- scalable folder architecture established;
+- environment contract defined;
+- centralized Axios client with interceptors created;
+- React Query provider and query-key factory created;
+- every current backend endpoint documented;
+- frontend-blocking backend contract gaps recorded.
+
+Authentication and business features intentionally begin in later phases.
+
+## Local setup
+
+```bash
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+Default configuration:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
+NEXT_PUBLIC_RAZORPAY_KEY_ID=
+```
+
+## Architecture
+
+```text
+Page / Component
+      ↓
+Feature React Query hook
+      ↓
+Feature API module
+      ↓
+services/api-client.js
+      ↓
+lib/axios.js
+      ↓
+BidX API Gateway
+```
+
+Read:
+
+- [Verified backend API contract](docs/API.md)
+- [Frontend architecture](docs/FRONTEND_ARCHITECTURE.md)
+- [Backend contract gaps](docs/CONTRACT_GAPS.md)
+
+## Important rule
+
+Components do not call Axios directly. Server state belongs to React Query, and
+each feature owns its API functions, hooks, and Zod schemas.
+
