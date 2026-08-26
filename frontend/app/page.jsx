@@ -1,5 +1,5 @@
-import BidXApp from "@/components/bidx-app";
+import MarketplaceHome from "@/components/marketplace/MarketplaceHome";
 
 export default function Home() {
-  return <BidXApp />;
+  return <MarketplaceHome />;
 }

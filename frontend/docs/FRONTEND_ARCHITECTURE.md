@@ -39,10 +39,10 @@ public/       Static assets
 ## Phase boundaries
 
 - **Phase 1:** foundation, dependencies, environment, Axios, React Query, API docs.
-- **Phase 2:** authentication service, schemas, provider and pages.
-- **Phase 3:** marketplace, auction listing/details and search.
+- **Phase 2:** authentication service, schemas, provider and pages — complete.
+- **Phase 3:** marketplace, auction listing/details and search — complete.
 - **Phase 4:** bidding API, idempotency, Socket.IO and timers.
 - **Phase 5+:** seller, payment, notifications, admin and production.
 
-Do not create feature modules before their phase begins.
+Do not create business feature modules before their phase begins.
 
