@@ -50,7 +50,8 @@ boundaries; the gateway and services remain authoritative.
 ## Session policy
 
 The current backend returns refresh tokens in JSON and requires them in the
-refresh body. The frontend therefore encapsulates browser persistence in
-`features/auth/storage.js`. See `CONTRACT_GAPS.md` for the recommended HttpOnly
+refresh body. The frontend keeps the access token only in React memory and
+persists the refresh token plus the non-sensitive user snapshot through
+`features/auth/storage.js`. On reload, the provider rotates the refresh token
+to restore the session. See `CONTRACT_GAPS.md` for the recommended HttpOnly
 cookie migration before a public production launch.
-

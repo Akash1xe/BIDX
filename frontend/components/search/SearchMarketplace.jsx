@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Filter, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,20 +16,14 @@ import { getPagination } from "@/utils/auction";
 const CONDITION_OPTIONS = ["", "NEW", "LIKE_NEW", "USED", "REFURBISHED"];
 const SORT_OPTIONS = ["relevance", "price_asc", "price_desc", "ending_soon", "newest"];
 
-export default function SearchMarketplace() {
+function SearchMarketplaceContent({ params, searchParams }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const params = Object.fromEntries(searchParams.entries());
   const page = Math.max(1, Number(params.page || 1));
   const request = { ...params, page, limit: Number(params.limit || 12) };
   const query = useSearch(request);
   const results = query.data?.results || [];
   const pagination = getPagination(query.data, page);
   const [filters, setFilters] = useState({ status: params.status || "", category: params.category || "", condition: params.condition || "", minPrice: params.minPrice || "", maxPrice: params.maxPrice || "", sort: params.sort || "relevance" });
-
-  useEffect(() => {
-    setFilters({ status: params.status || "", category: params.category || "", condition: params.condition || "", minPrice: params.minPrice || "", maxPrice: params.maxPrice || "", sort: params.sort || "relevance" });
-  }, [params.status, params.category, params.condition, params.minPrice, params.maxPrice, params.sort]);
 
   function apply(event) {
     event.preventDefault();
@@ -70,3 +64,10 @@ export default function SearchMarketplace() {
   );
 }
 
+export default function SearchMarketplace() {
+  const searchParams = useSearchParams();
+  const params = Object.fromEntries(searchParams.entries());
+  const filterKey = [params.status, params.category, params.condition, params.minPrice, params.maxPrice, params.sort].join("|");
+
+  return <SearchMarketplaceContent key={filterKey} params={params} searchParams={searchParams} />;
+}

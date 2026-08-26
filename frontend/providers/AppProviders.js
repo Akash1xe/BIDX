@@ -3,6 +3,8 @@
 import QueryProvider from "@/providers/QueryProvider";
 import AuthProvider from "@/providers/AuthProvider";
 import RealtimeProvider from "@/providers/RealtimeProvider";
+import NotificationProvider from "@/providers/NotificationProvider";
+import ConnectionBanner from "@/components/feedback/ConnectionBanner";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function AppProviders({ children }) {
@@ -10,8 +12,11 @@ export default function AppProviders({ children }) {
     <QueryProvider>
       <AuthProvider>
         <RealtimeProvider>
-          {children}
-          <Toaster position="top-right" />
+          <NotificationProvider>
+            <ConnectionBanner />
+            {children}
+            <Toaster position="top-right" />
+          </NotificationProvider>
         </RealtimeProvider>
       </AuthProvider>
     </QueryProvider>

@@ -28,10 +28,29 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const stored = readStoredSession();
-    sessionRef.current = stored;
-    setSession(stored);
-    setIsLoading(false);
-  }, []);
+    if (!stored?.tokens?.refreshToken) {
+      sessionRef.current = null;
+      const readyTimer = window.setTimeout(() => {
+        setSession(null);
+        setIsLoading(false);
+      }, 0);
+      return () => window.clearTimeout(readyTimer);
+    }
+
+    let cancelled = false;
+    authApi.refresh(stored.tokens.refreshToken)
+      .then((data) => {
+        if (!cancelled) commitSession(normalizeSession(data, stored.user));
+      })
+      .catch(() => {
+        if (!cancelled) commitSession(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [commitSession]);
 
   const refresh = useCallback(async () => {
     const current = sessionRef.current;
@@ -120,4 +139,3 @@ export default function AuthProvider({ children }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-

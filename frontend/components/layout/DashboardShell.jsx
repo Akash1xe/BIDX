@@ -6,17 +6,20 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import useAuth from "@/hooks/useAuth";
+import NotificationBell from "@/components/notification/NotificationBell";
 
 const roleLinks = {
   USER: [
     { href: "/dashboard", label: "My dashboard", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
+    { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
   ],
   SELLER: [
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
+    { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
     { href: "/seller", label: "Seller studio", icon: Store },
     { href: "/seller/products", label: "Products", icon: Store },
     { href: "/seller/auctions", label: "Auctions", icon: Gavel },
@@ -25,6 +28,7 @@ const roleLinks = {
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
+    { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
     { href: "/seller", label: "Seller studio", icon: Store },
     { href: "/seller/products", label: "Products", icon: Store },
     { href: "/seller/auctions", label: "Auctions", icon: Gavel },
@@ -51,7 +55,7 @@ export default function DashboardShell({ eyebrow, title, description, children }
           ))}
         </nav>
         <div className="dashboard-account">
-          <button className="icon-button" aria-label="Notifications"><Bell size={17} /></button>
+          <NotificationBell />
           <span className="dashboard-avatar">{user.name.slice(0, 1).toUpperCase()}</span>
           <div><strong>{user.name}</strong><small>{user.email}</small></div>
           <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out"><LogOut /></Button>
