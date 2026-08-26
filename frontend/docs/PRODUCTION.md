@@ -8,8 +8,8 @@ The browser communicates only with the public API Gateway:
 Frontend :3000 → API Gateway :4000 → internal services
 ```
 
-`NEXT_PUBLIC_API_URL` must end in `/api/v1`. `NEXT_PUBLIC_SOCKET_URL` must point
-to the same public gateway origin after WebSocket proxy support is added. Never
+`NEXT_PUBLIC_API_URL` must end in `/api/v1`. `NEXT_PUBLIC_SOCKET_URL` points to
+the same public gateway origin, which proxies Socket.IO polling and upgrades. Never
 configure the browser with internal service names or ports 4001–4007.
 
 ## Container deployment
@@ -38,10 +38,10 @@ image pattern.
 ## Session handling
 
 Access tokens are held in React memory and are never written to browser storage.
-On reload, the provider uses the persisted refresh token once to obtain a new
-token pair. This narrows access-token exposure, but the backend still requires
-the refresh token to be JavaScript-readable. The production target remains a
-rotated `Secure`, `HttpOnly`, `SameSite` refresh cookie with CSRF protection.
+On reload, the provider uses the rotated `Secure`, `HttpOnly`, `SameSite`
+refresh cookie to obtain a new access token. Cookie-backed refresh and logout
+also require an exact allowed `Origin` at the gateway. A legacy JSON refresh
+token remains supported only for rolling upgrades and development compatibility.
 
 ## Response security
 

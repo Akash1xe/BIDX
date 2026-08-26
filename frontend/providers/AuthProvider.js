@@ -28,7 +28,7 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const stored = readStoredSession();
-    if (!stored?.tokens?.refreshToken) {
+    if (!stored?.user) {
       sessionRef.current = null;
       const readyTimer = window.setTimeout(() => {
         setSession(null);
@@ -38,7 +38,7 @@ export default function AuthProvider({ children }) {
     }
 
     let cancelled = false;
-    authApi.refresh(stored.tokens.refreshToken)
+    authApi.refresh(stored.tokens?.refreshToken)
       .then((data) => {
         if (!cancelled) commitSession(normalizeSession(data, stored.user));
       })
@@ -56,10 +56,8 @@ export default function AuthProvider({ children }) {
     const current = sessionRef.current;
     const refreshToken = current?.tokens?.refreshToken;
 
-    if (!refreshToken) throw new Error("Your session has expired. Please sign in again.");
-
     const data = await authApi.refresh(refreshToken);
-    const nextSession = normalizeSession(data, current.user);
+    const nextSession = normalizeSession(data, current?.user);
     commitSession(nextSession);
     return nextSession.tokens.accessToken;
   }, [commitSession]);

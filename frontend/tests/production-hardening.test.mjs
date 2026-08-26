@@ -25,6 +25,14 @@ test("browser storage never persists the access token", () => {
   delete global.window;
 });
 
+test("session bootstrap supports an HttpOnly refresh cookie", async () => {
+  const provider = await readFile(new URL("../providers/AuthProvider.js", import.meta.url), "utf8");
+  const authApi = await readFile(new URL("../features/auth/api.js", import.meta.url), "utf8");
+  assert.match(provider, /if \(!stored\?\.user\)/);
+  assert.match(provider, /authApi\.refresh\(stored\.tokens\?\.refreshToken\)/);
+  assert.match(authApi, /refreshToken \? \{ refreshToken \} : \{\}/);
+});
+
 test("API errors retain status and gateway request ID", () => {
   const error = normalizeApiError({
     response: { status: 429, data: {}, headers: { "x-request-id": "req-123" } },

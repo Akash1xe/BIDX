@@ -22,11 +22,10 @@ export const authApi = {
   },
 
   refresh(refreshToken) {
-    return api.post("/auth/refresh", { refreshToken });
+    return api.post("/auth/refresh", refreshToken ? { refreshToken } : {});
   },
 
   logout(refreshToken) {
     return api.post("/auth/logout", refreshToken ? { refreshToken } : {});
   },
 };
-
