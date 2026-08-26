@@ -27,7 +27,7 @@ class OtpService {
 
     return {
       expiresInSeconds: env.otp.ttlSeconds,
-      ...(env.isProduction ? {} : { devOtp: code })
+      ...((env.isProduction && !env.demoMode) ? {} : { devOtp: code })
     };
   }
 
