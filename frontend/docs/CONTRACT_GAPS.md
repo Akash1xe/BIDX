@@ -73,6 +73,25 @@ verification requires the exact raw request bytes. Verify the webhook path end
 to end before production. A direct raw-body route or raw-body-preserving gateway
 proxy may be required.
 
+## 10. Development payment orders cannot be safely confirmed by the frontend
+
+When Razorpay server keys are absent, the Payment Service creates a `dev` order
+but `/payments/confirm` still requires an HMAC signature created with the backend
+key secret. The backend exposes neither a development confirmation endpoint nor
+a signed development checkout payload.
+
+The Phase 6 frontend therefore displays the development order but does not forge
+the secret or claim payment success. Add a development-only backend endpoint
+that returns a server-signed confirmation, or run the service with Razorpay test
+keys for an end-to-end checkout.
+
+## 11. Replayed live orders may omit the checkout key
+
+The initial live `POST /payments/order/:auctionId` response includes
+`keyIdForCheckout`. When an existing `CREATED` order is replayed, the service
+returns the payment plus `replayed: true` but omits the key. The frontend falls
+back to `NEXT_PUBLIC_RAZORPAY_KEY_ID`; configure it for reliable checkout resume.
+
 ## 8. The backend cannot issue an HttpOnly refresh-token cookie
 
 The backend returns both access and refresh tokens in JSON request bodies. The

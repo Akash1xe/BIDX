@@ -10,6 +10,7 @@ import ProductMedia from "@/components/auction/ProductMedia";
 import BidHistory from "@/components/bidding/BidHistory";
 import BidPanel from "@/components/bidding/BidPanel";
 import RealtimeBadge from "@/components/bidding/RealtimeBadge";
+import PaymentCallout from "@/components/payment/PaymentCallout";
 import { QueryError } from "@/components/feedback/QueryState";
 import { useAuction } from "@/features/auctions/hooks";
 import useAuctionSocket from "@/hooks/useAuctionSocket";
@@ -53,6 +54,7 @@ export default function AuctionDetails() {
           <div className="seller-line"><UserRound /><div><span>Seller ID</span><strong>{auction.sellerId || "Unavailable"}</strong></div></div>
           <RealtimeBadge status={realtimeStatus} />
           <BidPanel auction={auction} auctionId={auctionId} minimum={minimum} />
+          <PaymentCallout auction={auction} />
           <div className="detail-security"><ShieldCheck /> Backend state remains authoritative for price, status, role, and bid eligibility.</div>
         </div>
       </div>
