@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AlertTriangle, CheckCircle2, CreditCard, LoaderCircle, LockKeyhole, ReceiptText, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,6 @@ import useAuth from "@/hooks/useAuth";
 import { env } from "@/lib/env";
 import { loadRazorpayCheckout } from "@/lib/razorpay";
 import { formatMoney, getProduct } from "@/utils/auction";
-import { addDemoNotification } from "@/utils/demo-notifications";
 import { formatPaymentAmount } from "@/utils/payment";
 
 const PAYABLE_STATES = ["ENDED", "PAYMENT_PENDING"];
@@ -32,17 +31,6 @@ export default function PaymentCheckout() {
   const [checkoutError, setCheckoutError] = useState("");
   const [isOpening, setIsOpening] = useState(false);
 
-  useEffect(() => {
-    if (!isWinner || !auctionId || !["ENDED", "PAYMENT_PENDING", "SOLD"].includes(auction?.status)) return;
-    addDemoNotification(user.id, {
-      eventId: `winner:${auctionId}:${user.id}`,
-      type: "WINNER",
-      auctionId,
-      subject: "Congratulations! You won the auction",
-      data: { finalPrice: auction.finalPrice },
-    });
-  }, [auction?.finalPrice, auction?.status, auctionId, isWinner, user.id]);
-
   async function beginCheckout() {
     setCheckoutError("");
     setIsOpening(true);
@@ -54,14 +42,7 @@ export default function PaymentCheckout() {
         return;
       }
       if (order.mode !== "live") {
-        const confirmed = await confirmPayment.mutateAsync({ orderId: order.orderId });
-        addDemoNotification(user.id, {
-          eventId: `payment-receipt:${confirmed.orderId}:${user.id}`,
-          type: "PAYMENT_RECEIPT",
-          auctionId,
-          subject: "Your demo payment was completed",
-          data: { amountMinor: confirmed.amountMinor, orderId: confirmed.orderId },
-        });
+        await confirmPayment.mutateAsync({ orderId: order.orderId });
         toast.success("Demo payment completed.");
         return;
       }
