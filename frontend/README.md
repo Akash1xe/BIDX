@@ -4,7 +4,7 @@ Next.js App Router frontend for the BidX distributed auction platform.
 
 ## Phase status
 
-Phase 1 — Foundation:
+Phase 1 — Foundation (complete):
 
 - frontend dependencies installed;
 - scalable folder architecture established;
@@ -14,7 +14,15 @@ Phase 1 — Foundation:
 - every current backend endpoint documented;
 - frontend-blocking backend contract gaps recorded.
 
-Authentication and business features intentionally begin in later phases.
+Phase 2 — Authentication (complete):
+
+- login with Zod and React Hook Form validation;
+- signup → send OTP → verify OTP → create account flow;
+- shared AuthProvider and `useAuth()` hook;
+- access-token injection and queued refresh-token rotation;
+- idempotent logout and session cleanup;
+- protected buyer, seller, and admin route boundaries;
+- homepage navigation connected to the shared authenticated session.
 
 ## Local setup
 
@@ -53,9 +61,9 @@ Read:
 - [Verified backend API contract](docs/API.md)
 - [Frontend architecture](docs/FRONTEND_ARCHITECTURE.md)
 - [Backend contract gaps](docs/CONTRACT_GAPS.md)
+- [Authentication architecture](docs/AUTHENTICATION.md)
 
 ## Important rule
 
 Components do not call Axios directly. Server state belongs to React Query, and
 each feature owns its API functions, hooks, and Zod schemas.
-

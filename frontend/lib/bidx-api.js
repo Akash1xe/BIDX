@@ -1,3 +1,5 @@
+import { readStoredSession, writeStoredSession } from "@/features/auth/storage";
+
 const DEFAULT_API_URL = "http://localhost:4000";
 
 export const API_URL =
@@ -10,21 +12,12 @@ export const SOCKET_URL =
   process.env.NEXT_PUBLIC_BIDX_SOCKET_URL ||
   "http://localhost:4000";
 
-const STORAGE_KEY = "bidx-session";
-
 export function readSession() {
-  if (typeof window === "undefined") return null;
-  try {
-    return JSON.parse(window.localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return null;
-  }
+  return readStoredSession();
 }
 
 export function saveSession(session) {
-  if (typeof window === "undefined") return;
-  if (!session) window.localStorage.removeItem(STORAGE_KEY);
-  else window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  writeStoredSession(session);
 }
 
 function messageFrom(payload, fallback) {

@@ -63,11 +63,24 @@ verification requires the exact raw request bytes. Verify the webhook path end
 to end before production. A direct raw-body route or raw-body-preserving gateway
 proxy may be required.
 
-## 8. Token storage policy is not finalized
+## 8. The backend cannot issue an HttpOnly refresh-token cookie
 
 The backend returns both access and refresh tokens in JSON request bodies. The
-frontend HTTP layer intentionally does not hardcode localStorage. Phase 2 must
-choose an explicit policy—prefer short-lived access tokens in memory and a more
-secure refresh-token transport if the backend is updated to support HttpOnly
-cookies.
+Phase 2 frontend keeps the current session in one encapsulated browser-storage
+module because the backend requires the refresh token in the `/auth/refresh`
+request body. This is compatible with the current contract but exposes tokens
+to JavaScript if an XSS vulnerability exists.
+
+Preferred production improvement: issue and rotate the refresh token through a
+`Secure`, `HttpOnly`, `SameSite` cookie, keep the access token in memory, and add
+the required CSRF policy. The AuthProvider and Axios bridge isolate storage so
+that migration does not require rewriting feature components.
+
+## 9. Google login has no frontend identity-provider configuration
+
+The backend accepts `{ idToken }` at `POST /auth/google`, and the frontend API
+function is implemented. A Google button is intentionally not shown yet because
+the repository does not define the required public Google client ID or browser
+identity-provider initialization. Add that configuration before enabling the UI;
+never fabricate an ID token in the browser.
 
