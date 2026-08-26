@@ -24,6 +24,16 @@ Phase 2 — Authentication (complete):
 - protected buyer, seller, and admin route boundaries;
 - homepage navigation connected to the shared authenticated session.
 
+Phase 3 — Marketplace (complete):
+
+- homepage live and scheduled auctions use the real Auction API;
+- searchable auction catalog with status, category, page-size, and pagination controls;
+- auction details with product gallery, pricing rules, seller identity, status, and countdown;
+- Elasticsearch search with keyword, status, category, condition, price, sort, and pagination;
+- 300ms debounced search autocomplete;
+- shared skeleton, empty, gateway-error, and retry states;
+- legacy demo auction data and duplicate fetch client removed.
+
 ## Local setup
 
 ```bash
@@ -62,6 +72,7 @@ Read:
 - [Frontend architecture](docs/FRONTEND_ARCHITECTURE.md)
 - [Backend contract gaps](docs/CONTRACT_GAPS.md)
 - [Authentication architecture](docs/AUTHENTICATION.md)
+- [Marketplace architecture](docs/MARKETPLACE.md)
 
 ## Important rule
 
