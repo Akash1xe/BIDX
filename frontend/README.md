@@ -1,0 +1,1 @@
+# BidX Frontend\n\nNext.js App Router frontend for the BidX microservices backend.\n\n```bash\ncp .env.example .env.local\nnpm install\nnpm run dev\n```\n\nThe API Gateway defaults to `http://localhost:4000`; authenticated Socket.IO bidding connects directly to the Bidding Service on `http://localhost:4004`.\n
