@@ -15,7 +15,7 @@ function formatDuration(milliseconds) {
 }
 
 export default function AuctionTimer({ auction, compact = false }) {
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -26,6 +26,14 @@ export default function AuctionTimer({ auction, compact = false }) {
     const status = String(auction?.status || "").toUpperCase();
     const start = new Date(auction?.startTime).getTime();
     const end = new Date(auction?.endTime).getTime();
+
+    if (!now) {
+      return {
+        label: status === "SCHEDULED" || status === "DRAFT" ? "Starts in" : "Ends in",
+        value: "--:--:--",
+        tone: status === "SCHEDULED" || status === "DRAFT" ? "upcoming" : "live",
+      };
+    }
 
     if (["ENDED", "SOLD", "UNSOLD", "PAYMENT_PENDING"].includes(status) || (end && now >= end)) {
       return { label: "Auction ended", value: "Ended", tone: "ended" };
@@ -43,4 +51,3 @@ export default function AuctionTimer({ auction, compact = false }) {
     </div>
   );
 }
-
