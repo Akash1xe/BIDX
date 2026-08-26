@@ -5,6 +5,7 @@
   "description": "BidX shared library - logger, errors, constants, kafka producer",
   "main": "index.js",
   "dependencies": {
+    "ioredis": "^5.4.1",
     "kafkajs": "^2.2.4"
   }
 }
