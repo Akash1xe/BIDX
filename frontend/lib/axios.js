@@ -5,7 +5,7 @@ import { normalizeApiError } from "@/utils/api-error";
 
 const apiClient = axios.create({
   baseURL: env.apiUrl,
-  timeout: 10_000,
+  timeout: env.apiTimeoutMs,
   withCredentials: true,
   headers: {
     Accept: "application/json",

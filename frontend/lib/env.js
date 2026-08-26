@@ -12,6 +12,7 @@ export const env = Object.freeze({
   socketUrl: withoutTrailingSlash(
     process.env.NEXT_PUBLIC_SOCKET_URL || DEFAULT_SOCKET_URL
   ),
+  apiTimeoutMs: Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS || 90_000),
   razorpayKeyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
 });
 

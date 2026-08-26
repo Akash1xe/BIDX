@@ -113,3 +113,15 @@ test("payment startup logs never include MongoDB credentials", async () => {
   assert.match(db, /new URL\(uri\)\.host/);
   assert.doesNotMatch(db, /uri\.split\("\/\/"\)\[1\]/);
 });
+
+test("frontend tolerates Render free-tier cold starts", async () => {
+  const env = await read("frontend/lib/env.js");
+  const client = await read("frontend/lib/axios.js");
+  assert.match(env, /NEXT_PUBLIC_API_TIMEOUT_MS \|\| 90_000/);
+  assert.match(client, /timeout: env\.apiTimeoutMs/);
+});
+
+test("gateway tolerates Render free-tier upstream cold starts", async () => {
+  const env = await read("api-gateway/src/config/env.js");
+  assert.match(env, /UPSTREAM_TIMEOUT_MS \|\| "60000"/);
+});

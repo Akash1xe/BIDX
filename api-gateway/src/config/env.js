@@ -33,7 +33,7 @@ const env = {
     windowMs: parseInt(process.env.GATEWAY_RATE_LIMIT_WINDOW_MS || "60000", 10),
     max: parseInt(process.env.GATEWAY_RATE_LIMIT_MAX || "300", 10)
   },
-  upstreamTimeoutMs: parseInt(process.env.UPSTREAM_TIMEOUT_MS || "8000", 10),
+  upstreamTimeoutMs: parseInt(process.env.UPSTREAM_TIMEOUT_MS || "60000", 10),
   redisUrl: required("REDIS_URL", "redis://localhost:6379"),
   services: {
     user: required("USER_SERVICE_URL", "http://localhost:4001"),
