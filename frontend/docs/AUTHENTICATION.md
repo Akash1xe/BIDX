@@ -49,9 +49,9 @@ boundaries; the gateway and services remain authoritative.
 
 ## Session policy
 
-The current backend returns refresh tokens in JSON and requires them in the
-refresh body. The frontend keeps the access token only in React memory and
-persists the refresh token plus the non-sensitive user snapshot through
-`features/auth/storage.js`. On reload, the provider rotates the refresh token
-to restore the session. See `CONTRACT_GAPS.md` for the recommended HttpOnly
-cookie migration before a public production launch.
+The production backend rotates the refresh credential in a `Secure`,
+`HttpOnly`, `SameSite` cookie. Access tokens stay only in React memory. The
+provider persists a non-sensitive user snapshot so reload can attempt the
+cookie-backed refresh; Axios sends credentials to the gateway. During a rolling
+migration, a legacy JSON refresh token is still accepted and stored only when
+an older backend explicitly returns it.

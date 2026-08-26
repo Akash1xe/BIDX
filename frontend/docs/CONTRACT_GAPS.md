@@ -3,40 +3,19 @@
 These are observations from the current backend code, not speculative frontend
 features. Resolve them in the backend phase where they become blocking.
 
-## 1. Socket.IO is not available through the API Gateway
+## 1. Socket.IO gateway boundary — resolved in backend hardening
 
-The roadmap requires the browser to connect only to port `4000`, but Socket.IO
-is attached to the Bidding Service HTTP server on port `4004`. The gateway's
-proxy uses `fetch()` for JSON HTTP requests and has no WebSocket upgrade proxy.
+The API Gateway now proxies both Socket.IO polling requests and WebSocket
+upgrades to the Bidding Service. The browser continues to use port `4000`, the
+Bidding Service still verifies the handshake JWT, and production origins must
+be explicitly allowlisted. The existing polling fallback remains useful during
+temporary connection failures.
 
-Before real-time bidding, either:
+## 2. Notification identity — resolved in backend hardening
 
-1. add Socket.IO/WebSocket proxying at the gateway and keep
-   `NEXT_PUBLIC_SOCKET_URL=http://localhost:4000`; or
-2. explicitly approve a separate public Socket.IO origin for the Bidding
-   Service.
-
-The frontend foundation uses option 1 as the intended architecture.
-
-Phase 4 is implemented against the gateway URL and visibly reports `REST refresh
-active` when the Socket.IO handshake is unavailable. Auction details and bid
-history poll every 15 seconds, so confirmed state still converges without asking
-the browser to call port `4004` directly. True push updates require the gateway
-fix above.
-
-## 2. Notification identity is not protected
-
-The gateway marks `/api/v1/notifications` as unauthenticated and clears identity
-headers on unauthenticated routes. Therefore `/notifications/mine` currently
-depends on a caller-controlled `userId` query parameter. Any caller could ask
-for another user's notification records.
-
-Required backend fix: protect `/notifications/mine` at the gateway and derive
-the user only from the verified `x-user-id` identity header.
-
-Phase 7 passes only the current authenticated session's user ID, but this is a
-frontend safety measure rather than authorization. The backend vulnerability
-remains until the gateway and service enforce identity.
+The gateway now authenticates notification routes, `/notifications/mine`
+derives identity only from the verified gateway header, and auction-wide
+records plus delivery statistics require `ADMIN`.
 
 The service also has no read/unread fields or mark-read mutation. Phase 7 keeps
 read IDs per authenticated user in device-local storage, so read state does not
@@ -78,12 +57,11 @@ Phase 7 polls the notification feed every 15 seconds. The first response is a
 silent baseline; only later records create toasts. `OUTBID` records are excluded
 because the existing `bid:outbid` socket handler already alerts the browser.
 
-## 7. Razorpay webhook raw-body handling needs verification
+## 7. Razorpay raw webhook bytes — resolved in backend hardening
 
-The gateway parses JSON and reserializes request bodies while Razorpay signature
-verification requires the exact raw request bytes. Verify the webhook path end
-to end before production. A direct raw-body route or raw-body-preserving gateway
-proxy may be required.
+The gateway captures the webhook route before JSON parsing and forwards its
+original buffer and content type. The Payment Service therefore verifies the
+signature against the exact provider bytes.
 
 ## 10. Development payment orders cannot be safely confirmed by the frontend
 
@@ -104,19 +82,12 @@ The initial live `POST /payments/order/:auctionId` response includes
 returns the payment plus `replayed: true` but omits the key. The frontend falls
 back to `NEXT_PUBLIC_RAZORPAY_KEY_ID`; configure it for reliable checkout resume.
 
-## 8. The backend cannot issue an HttpOnly refresh-token cookie
+## 8. HttpOnly refresh-token rotation — resolved in backend hardening
 
-The backend returns both access and refresh tokens in JSON request bodies. The
-frontend keeps access tokens only in memory, but still persists the refresh
-token in one encapsulated browser-storage module because the backend requires
-it in the `/auth/refresh` request body. This is compatible with the current
-contract but leaves the long-lived refresh credential exposed to JavaScript if
-an XSS vulnerability exists.
-
-Preferred production improvement: issue and rotate the refresh token through a
-`Secure`, `HttpOnly`, `SameSite` cookie, keep the access token in memory, and add
-the required CSRF policy. The AuthProvider and Axios bridge isolate storage so
-that migration does not require rewriting feature components.
+Login, signup, Google auth, and refresh now rotate the refresh credential in a
+configurable `Secure`, `HttpOnly`, `SameSite` cookie. The gateway preserves the
+cookie and enforces exact-Origin checks on cookie-backed refresh/logout. A
+legacy JSON token remains optional for rolling upgrades; production disables it.
 
 ## 9. Google login has no frontend identity-provider configuration
 
@@ -140,9 +111,7 @@ The current audit schema records actor, action, target, details, and time. It ha
 no IP address, request ID, result, or failure record. The Phase 8 audit table
 therefore displays only verified stored fields.
 
-## 14. The backend permits an admin to suspend itself
+## 14. Admin self-suspension — resolved in backend hardening
 
-The suspension controller does not reject an actor targeting its own user ID.
-The Phase 8 UI hides this action for the current admin to reduce accidental
-lockout, but the backend must enforce this rule because frontend checks can be
-bypassed.
+The Admin Service now rejects an administrator targeting its own user ID. The
+existing frontend guard remains a UX safeguard, while the backend is authoritative.

@@ -15,9 +15,9 @@ export function writeStoredSession(session) {
   if (typeof window === "undefined") return;
 
   if (session) {
-    // Keep the short-lived access token in memory. The current backend still
-    // requires a JS-readable refresh token until it can issue an HttpOnly
-    // cookie, so persist only the minimum session needed to bootstrap.
+    // Access tokens always stay in memory. A refresh token is retained only
+    // when a legacy backend returns one; the production backend uses an
+    // HttpOnly cookie, so this field is omitted automatically.
     window.localStorage.setItem(SESSION_KEY, JSON.stringify({
       user: session.user,
       tokens: { refreshToken: session.tokens?.refreshToken },

@@ -1,14 +1,7 @@
 const HOP_BY_HOP = new Set([
-  "connection",
-  "keep-alive",
-  "transfer-encoding",
-  "upgrade",
-  "proxy-authenticate",
-  "proxy-authorization",
-  "te",
-  "trailer"
+  "connection", "keep-alive", "transfer-encoding", "upgrade",
+  "proxy-authenticate", "proxy-authorization", "te", "trailer"
 ]);
-
 const SKIPPED = new Set(["host", "content-length"]);
 
 class UpstreamUnavailableError extends Error {
@@ -32,22 +25,29 @@ function buildForwardHeaders(req, extraHeaders = {}) {
   const headers = {};
   for (const [key, value] of Object.entries(req.headers)) {
     const lower = key.toLowerCase();
-    if (HOP_BY_HOP.has(lower) || SKIPPED.has(lower)) {
-      continue;
-    }
-    headers[lower] = value;
+    if (!HOP_BY_HOP.has(lower) && !SKIPPED.has(lower)) headers[lower] = value;
   }
   Object.assign(headers, extraHeaders);
+  return headers;
+}
+
+function responseHeaders(response) {
+  const headers = {};
+  const setCookies = typeof response.headers.getSetCookie === "function"
+    ? response.headers.getSetCookie()
+    : [response.headers.get("set-cookie")].filter(Boolean);
+  if (setCookies.length) headers["set-cookie"] = setCookies;
+  const retryAfter = response.headers.get("retry-after");
+  if (retryAfter) headers["retry-after"] = retryAfter;
   return headers;
 }
 
 async function forward(req, targetBaseUrl, { timeoutMs = 8000, extraHeaders = {} } = {}) {
   const url = `${targetBaseUrl.replace(/\/$/, "")}${req.originalUrl}`;
   const method = req.method.toUpperCase();
-
   const hasBody = !["GET", "HEAD"].includes(method);
-  const body = hasBody ? JSON.stringify(req.body ?? {}) : undefined;
-
+  const rawBody = Buffer.isBuffer(req.body);
+  const body = hasBody ? (rawBody ? req.body : JSON.stringify(req.body ?? {})) : undefined;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -57,34 +57,23 @@ async function forward(req, targetBaseUrl, { timeoutMs = 8000, extraHeaders = {}
       method,
       headers: buildForwardHeaders(req, {
         ...extraHeaders,
-        ...(hasBody ? { "content-type": "application/json" } : {})
+        ...(hasBody && !rawBody ? { "content-type": "application/json" } : {})
       }),
       body,
       signal: controller.signal,
       redirect: "manual"
     });
-  } catch (err) {
-    clearTimeout(timer);
-    if (err.name === "AbortError") {
-      throw new UpstreamTimeoutError(url, timeoutMs);
-    }
-    throw new UpstreamUnavailableError(url, err);
+  } catch (error) {
+    if (error.name === "AbortError") throw new UpstreamTimeoutError(url, timeoutMs);
+    throw new UpstreamUnavailableError(url, error);
   } finally {
     clearTimeout(timer);
   }
 
   const text = await response.text();
   let data = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = text;
-  }
-
-  return {
-    status: response.status,
-    body: data
-  };
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  return { status: response.status, body: data, headers: responseHeaders(response) };
 }
 
-module.exports = { forward, UpstreamUnavailableError, UpstreamTimeoutError };
+module.exports = { forward, buildForwardHeaders, responseHeaders, UpstreamUnavailableError, UpstreamTimeoutError };
