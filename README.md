@@ -77,6 +77,17 @@ Phase 7 — Notifications (complete):
 - auction links plus loading, error, empty, and delivery states;
 - notification identity, persistence, and socket gaps documented.
 
+Phase 8 — Admin workspace (complete):
+
+- backend aggregate statistics and verified payment GMV;
+- searchable, paginated account moderation;
+- confirmed suspend and restore actions with optional reasons;
+- current-admin lockout protection in the interface;
+- status-filtered, paginated auction inspection;
+- chronological server-owned audit history;
+- exact loading, error, empty, and responsive states;
+- missing time-series, audit-context, and self-suspension backend gaps documented.
+
 ## Local setup
 
 ```bash
@@ -120,6 +131,7 @@ Read:
 - [Seller workspace architecture](docs/SELLER.md)
 - [Payment architecture](docs/PAYMENTS.md)
 - [Notification architecture](docs/NOTIFICATIONS.md)
+- [Admin architecture](docs/ADMIN.md)
 
 ## Important rule
 
