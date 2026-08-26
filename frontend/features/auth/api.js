@@ -28,4 +28,8 @@ export const authApi = {
   logout(refreshToken) {
     return api.post("/auth/logout", refreshToken ? { refreshToken } : {});
   },
+
+  becomeSeller() {
+    return api.post("/users/me/seller", {});
+  },
 };

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Gavel, UserRound, WalletCards } from "lucide-react";
 import RoleGuard from "@/components/auth/RoleGuard";
 import DashboardShell from "@/components/layout/DashboardShell";
+import SellerOnboardingCard from "@/components/seller/SellerOnboardingCard";
 
 export default function DashboardPage() {
   return (
@@ -14,6 +15,7 @@ export default function DashboardPage() {
           <article><WalletCards /><span>Payments</span><strong>Verified checkout</strong><p>Review winning orders and backend-confirmed payment status.</p><Link className="dashboard-card-link" href="/dashboard/payments">Open payments <ArrowRight /></Link></article>
           <article><UserRound /><span>Profile</span><strong>Authenticated</strong><p>Your identity is loaded from the shared BidX session and remains backend-authoritative.</p></article>
         </div>
+        <SellerOnboardingCard />
       </DashboardShell>
     </RoleGuard>
   );
