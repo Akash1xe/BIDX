@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Gavel, LogOut, ShieldCheck, Store, UserRound } from "lucide-react";
+import { Bell, CreditCard, Gavel, LogOut, ShieldCheck, Store, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +11,12 @@ const roleLinks = {
   USER: [
     { href: "/dashboard", label: "My dashboard", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
+    { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
   ],
   SELLER: [
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
+    { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
     { href: "/seller", label: "Seller studio", icon: Store },
     { href: "/seller/products", label: "Products", icon: Store },
     { href: "/seller/auctions", label: "Auctions", icon: Gavel },
@@ -22,6 +24,7 @@ const roleLinks = {
   ADMIN: [
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
+    { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
     { href: "/seller", label: "Seller studio", icon: Store },
     { href: "/seller/products", label: "Products", icon: Store },
     { href: "/seller/auctions", label: "Auctions", icon: Gavel },

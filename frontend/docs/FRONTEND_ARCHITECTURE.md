@@ -45,7 +45,9 @@ public/       Static assets
   Socket.IO cache updates, outbid alerts, timers and My Bids — complete.
 - **Phase 5:** seller dashboard, product creation, auction creation and auction
   lifecycle management — complete.
-- **Phase 6+:** payment, notifications, admin and production.
+- **Phase 6:** winner checkout, Razorpay confirmation, payment status and
+  participant history — complete.
+- **Phase 7+:** notifications, admin and production.
 
 Do not create business feature modules before their phase begins.
 

@@ -55,6 +55,18 @@ Phase 5 — Seller workspace (complete):
 - accurate contract-gap state instead of a fabricated product inventory;
 - responsive forms, tables, loading, error, empty, and success states.
 
+Phase 6 — Payments (complete):
+
+- winner-only payment entry point after an eligible auction ends;
+- seller read-only payment tracking;
+- backend order creation and idempotent order replay handling;
+- lazy Razorpay Checkout loading with order, amount, and buyer prefill;
+- signed checkout confirmation through the Payment Service;
+- PAID state only after backend verification;
+- webhook-aware polling for pending orders;
+- authenticated winner/seller payment history;
+- explicit development-mode and replay-key contract-gap handling.
+
 ## Local setup
 
 ```bash
@@ -96,6 +108,7 @@ Read:
 - [Marketplace architecture](docs/MARKETPLACE.md)
 - [Bidding architecture](docs/BIDDING.md)
 - [Seller workspace architecture](docs/SELLER.md)
+- [Payment architecture](docs/PAYMENTS.md)
 
 ## Important rule
 
