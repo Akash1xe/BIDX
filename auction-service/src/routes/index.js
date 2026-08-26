@@ -11,6 +11,7 @@ router.get("/health", asyncHandler(healthCheck));
 router.use("/health", asyncHandler(healthCheck));
 
 router.post("/products", optionalIdentity, productController.createProduct);
+router.get("/products/mine", requireIdentity, productController.listMyProducts);
 router.get("/products/:productId", optionalIdentity, productController.getProduct);
 router.delete("/products/:productId", requireIdentity, productController.deleteProduct);
 

@@ -3,6 +3,7 @@ const env = require("./env");
 const ROUTES = [
   { prefix: "/api/v1/auth", service: "user", target: env.services.user, auth: false },
   { prefix: "/api/v1/users", service: "user", target: env.services.user, auth: true },
+  { prefix: "/api/v1/products/mine", service: "auction", target: env.services.auction, auth: true },
   { prefix: "/api/v1/products", service: "auction", target: env.services.auction, auth: false },
   { prefix: "/api/v1/auctions", service: "auction", target: env.services.auction, auth: false },
   { prefix: "/api/v1/search", service: "search", target: env.services.search, auth: false },

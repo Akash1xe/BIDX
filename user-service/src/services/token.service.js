@@ -9,9 +9,7 @@ const ISSUER = "bidx.user-service";
 
 function parseDurationToMs(duration) {
   const match = /^(\d+)([smhd])$/.exec(String(duration));
-  if (!match) {
-    return 15 * 60 * 1000;
-  }
+  if (!match) return 15 * 60 * 1000;
   const multipliers = { s: 1000, m: 60000, h: 3600000, d: 86400000 };
   return parseInt(match[1], 10) * multipliers[match[2]];
 }
@@ -65,33 +63,22 @@ class TokenService {
     } catch {
       throw ApiError.unauthorized("Invalid or expired refresh token");
     }
-
     const tokenHash = hashJti(payload.jti);
     const stored = await refreshTokenRepository.findByTokenHash(tokenHash);
-    if (!stored) {
-      throw ApiError.unauthorized("Invalid refresh token");
-    }
-
+    if (!stored) throw ApiError.unauthorized("Invalid refresh token");
     if (stored.revokedAt) {
       await refreshTokenRepository.revokeAllForUser(stored.userId);
-      throw ApiError.unauthorized(
-        "Refresh token reuse detected, all sessions have been revoked"
-      );
+      throw ApiError.unauthorized("Refresh token reuse detected, all sessions have been revoked");
     }
-
-    if (stored.expiresAt <= new Date()) {
-      throw ApiError.unauthorized("Refresh token expired");
-    }
-
+    if (stored.expiresAt <= new Date()) throw ApiError.unauthorized("Refresh token expired");
     const user = await userRepository.findById(stored.userId);
     if (!user || user.isSuspended) {
       await refreshTokenRepository.revoke(stored.tokenHash);
       throw ApiError.unauthorized("Account unavailable");
     }
-
     await refreshTokenRepository.revoke(stored.tokenHash);
     const tokens = await this.issueTokens(user);
-    return { user, tokens };
+    return { user: user.toPublicProfile(), tokens };
   }
 
   async logout(refreshToken) {
