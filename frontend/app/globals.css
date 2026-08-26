@@ -429,6 +429,64 @@ footer p { flex: 1; }
 .dashboard-grid article strong { margin-top: 7px; font-family: Georgia, serif; font-size: 23px; font-weight: 500; }
 .dashboard-grid article p { margin: 9px 0 0; color: #716d64; font-size: 12px; line-height: 1.55; }
 
+.seller-action-row { margin-top: 32px; display: flex; gap: 10px; }
+.seller-action-row a { gap: 7px; }
+.seller-stats { margin-top: 22px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
+.seller-stats article { min-height: 205px; padding: 22px; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 16px; background: rgba(255,253,247,.74); }
+.seller-stats article > svg { width: 20px; color: var(--coral); }
+.seller-stats span { margin-top: auto; color: #89847b; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.seller-stats strong { min-height: 43px; margin-top: 5px; font-family: Georgia, serif; font-size: 31px; font-weight: 500; }
+.seller-stats p { margin: 5px 0 0; color: #777269; font-size: 10px; line-height: 1.5; }
+.seller-stat-skeleton { width: 70px; height: 34px; }
+.seller-paths { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.seller-paths > a { min-height: 215px; padding: 28px; display: flex; justify-content: space-between; align-items: flex-start; border-radius: 17px; background: var(--ink); color: white; text-decoration: none; }
+.seller-paths > a > div > svg { color: #f0b54c; }
+.seller-paths > a > svg { color: #88857e; }
+.seller-paths span { display: block; margin-top: 38px; color: #99968f; font-size: 9px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.seller-paths h2 { margin: 5px 0 7px; font-family: Georgia, serif; font-size: 31px; font-weight: 500; }
+.seller-paths p { max-width: 430px; margin: 0; color: #aaa79f; font-size: 11px; line-height: 1.55; }
+.seller-form { max-width: 850px; margin-top: 38px; padding: 30px; border: 1px solid var(--border); border-radius: 18px; background: rgba(255,253,247,.75); }
+.seller-form-heading { padding-bottom: 23px; display: flex; gap: 13px; border-bottom: 1px solid var(--border); }
+.seller-form-heading > svg { color: var(--coral); }
+.seller-form-heading h2 { margin: 0; font-family: Georgia, serif; font-size: 29px; font-weight: 500; }
+.seller-form-heading p { margin: 5px 0 0; color: #777269; font-size: 11px; }
+.seller-form-grid { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.seller-form-grid .field input, .seller-form-grid .field select { height: 47px; background: white; }
+.seller-form-grid .field textarea { background: white; }
+.seller-form-grid [data-slot="native-select-wrapper"] { width: 100%; }
+.seller-form-span { grid-column: 1 / -1; }
+.seller-submit { min-width: 190px; height: 47px; margin-top: 23px; gap: 7px; }
+.seller-form-error { margin: 18px 0 0; padding: 11px 13px; border-radius: 9px; color: #8e3023; background: #f7ddd7; font-size: 11px; }
+.seller-contract-note { margin: 18px 0 0; padding: 12px; border-radius: 9px; color: #716d64; background: #ece7dc; font-size: 10px; line-height: 1.55; }
+.seller-success { max-width: 750px; margin-top: 38px; padding: 38px; border: 1px solid #b8d3c6; border-radius: 18px; background: #e4eee7; }
+.seller-success > svg { width: 35px; height: 35px; color: var(--green); }
+.seller-success .eyebrow { margin-top: 26px; color: var(--green); }
+.seller-success h2 { margin: 8px 0; font-family: Georgia, serif; font-size: 38px; font-weight: 500; }
+.seller-success > p:not(.eyebrow) { color: #547064; font-size: 12px; }
+.product-id { margin-top: 20px; padding: 11px 11px 11px 14px; display: flex; align-items: center; gap: 12px; border: 1px solid #b8d3c6; border-radius: 10px; background: rgba(255,255,255,.6); }
+.product-id code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.seller-success-actions { margin-top: 17px; display: flex; gap: 9px; }
+.contract-gap-panel { max-width: 800px; margin-top: 38px; padding: 33px; display: flex; gap: 19px; border: 1px solid #dfc783; border-radius: 18px; background: #f7ecd0; }
+.contract-gap-panel > svg { flex: 0 0 auto; color: #9a7023; }
+.contract-gap-panel h2 { margin: 8px 0; font-family: Georgia, serif; font-size: 31px; font-weight: 500; }
+.contract-gap-panel p:not(.eyebrow) { margin: 0 0 20px; color: #716344; font-size: 12px; line-height: 1.65; }
+.seller-list-toolbar { margin-top: 31px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.seller-list-toolbar p { margin: 0; color: #777269; font-size: 11px; }
+.seller-auction-table { margin-top: 22px; }
+.seller-auction-table td:first-child strong, .seller-auction-table td:first-child small { display: block; }
+.seller-auction-table td:first-child small { max-width: 150px; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; color: #8a857b; font-size: 8px; }
+.seller-table-actions { display: flex; align-items: center; gap: 5px; }
+.seller-table-actions button { gap: 5px; }
+.seller-pagination { margin-top: 20px; display: flex; align-items: center; justify-content: flex-end; gap: 13px; }
+.seller-pagination span { color: #777269; font-size: 11px; }
+.manager-summary { margin-top: 36px; padding: 25px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-radius: 17px; background: var(--ink); color: white; }
+.manager-summary h2 { margin: 15px 0 6px; font-family: Georgia, serif; font-size: 35px; font-weight: 500; }
+.manager-summary p { margin: 0; color: #aaa79f; font-size: 11px; }
+.manager-summary p strong { color: white; }
+.manager-form { margin-top: 18px; }
+.manager-actions { max-width: 850px; margin-top: 14px; display: flex; gap: 9px; }
+.manager-loading { margin-top: 35px; }
+
 .auction-dialog { max-width: 980px !important; grid-template-columns: 1fr 1fr; gap: 0; padding: 0; overflow: hidden; border-radius: 20px; background: var(--cream); }
 .detail-art { min-height: 600px; padding: 18px; }
 .product-art-large { height: 100%; min-height: 560px; }
@@ -488,6 +546,14 @@ footer p { flex: 1; }
   .dashboard-content { padding: 54px 20px; }
   .dashboard-title { flex-direction: column; }
   .dashboard-grid { grid-template-columns: 1fr; }
+  .seller-stats { grid-template-columns: 1fr 1fr; }
+  .seller-paths { grid-template-columns: 1fr; }
+  .seller-form { padding: 22px; }
+  .seller-form-grid { grid-template-columns: 1fr; }
+  .seller-form-span { grid-column: auto; }
+  .seller-success-actions, .seller-action-row, .manager-actions { flex-direction: column; align-items: stretch; }
+  .seller-list-toolbar, .manager-summary { align-items: stretch; flex-direction: column; }
+  .contract-gap-panel { padding: 24px; }
   .header-inner { padding: 0 18px; }
   .header-inner nav { display: none; position: absolute; top: 71px; left: 0; right: 0; margin: 0; padding: 24px; flex-direction: column; background: var(--paper); border-bottom: 1px solid var(--border); }
   .header-inner nav.nav-open { display: flex; }
