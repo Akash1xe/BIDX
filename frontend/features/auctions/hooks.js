@@ -16,6 +16,9 @@ export function useAuction(auctionId) {
     queryKey: queryKeys.auction(auctionId),
     queryFn: () => auctionsApi.getById(auctionId),
     enabled: Boolean(auctionId),
+    refetchInterval(query) {
+      const status = query.state.data?.status;
+      return status === "LIVE" || status === "SCHEDULED" ? 15_000 : false;
+    },
   });
 }
-
