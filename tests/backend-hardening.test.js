@@ -52,3 +52,37 @@ test("backend blocks admin self-suspension", async () => {
   assert.match(controller, /req\.params\.id === req\.user\.id/);
   assert.match(controller, /cannot suspend their own account/);
 });
+
+test("all Render web services honor the platform PORT", async () => {
+  const configs = [
+    "api-gateway/src/config/env.js",
+    "user-service/src/config/env.js",
+    "auction-service/src/config/env.js",
+    "search-service/src/config/env.js",
+    "bidding-service/src/config/env.js",
+    "payment-service/src/config/env.js",
+    "notification-service/src/config/env.js",
+    "admin-service/src/config/env.js"
+  ];
+  for (const file of configs) {
+    assert.match(await read(file), /process\.env\.PORT/, `${file} must use Render's PORT`);
+  }
+});
+
+test("demo mode removes Kafka and Elasticsearch startup dependencies", async () => {
+  for (const file of [
+    "user-service/src/server.js",
+    "auction-service/src/server.js",
+    "bidding-service/src/server.js",
+    "payment-service/src/server.js",
+    "notification-service/src/server.js",
+    "search-service/src/server.js"
+  ]) {
+    assert.match(await read(file), /env\.demoMode/, `${file} must gate optional infrastructure`);
+  }
+
+  const search = await read("search-service/src/services/search.service.js");
+  assert.match(search, /fetchDemoAuctions/);
+  assert.match(search, /AUCTION_SERVICE_URL|auctionServiceUrl/);
+  assert.match(search, /mode: "demo"/);
+});

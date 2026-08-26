@@ -10,11 +10,15 @@ async function main() {
   await db.connect(env.mongoUri);
   redis.init(env.redisUrl);
 
-  publisher
-    .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
-    .catch(() => {
-      logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
-    });
+  if (!env.demoMode) {
+    publisher
+      .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
+      .catch(() => {
+        logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
+      });
+  } else {
+    logger.info("Demo mode enabled: Kafka producer is disabled");
+  }
 
   const app = createApp();
   const server = app.listen(env.port, () => {

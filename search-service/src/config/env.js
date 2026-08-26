@@ -25,10 +25,12 @@ function required(key, fallback) {
 const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   isProduction: process.env.NODE_ENV === "production",
+  demoMode: String(process.env.DEMO_MODE || "false").toLowerCase() === "true",
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "search-service",
 
-  port: parseInt(required("SEARCH_SERVICE_PORT", "4003"), 10),
+  port: parseInt(process.env.PORT || required("SEARCH_SERVICE_PORT", "4003"), 10),
+  auctionServiceUrl: (process.env.AUCTION_SERVICE_URL || "http://localhost:4002").replace(/\/$/, ""),
 
   elasticsearch: {
     node: required("ELASTICSEARCH_NODE", "http://localhost:9200"),

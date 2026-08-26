@@ -6,6 +6,24 @@ const dlq = require("@bidx/shared/kafka/dlq");
 const { ApiResponse } = require("@bidx/shared");
 
 async function healthCheck(req, res) {
+  if (env.demoMode) {
+    return ApiResponse.success(res, {
+      message: "Service healthy in demo mode",
+      data: {
+        status: "ok",
+        service: env.serviceName,
+        mode: "demo",
+        uptimeSeconds: Math.floor(process.uptime()),
+        timestamp: new Date().toISOString(),
+        services: {
+          auctionFallback: { configured: Boolean(env.auctionServiceUrl) },
+          elasticsearch: { connected: false, disabled: true },
+          kafka: { connected: false, disabled: true }
+        }
+      }
+    });
+  }
+
   const elasticsearchConnected = await es.ping();
   const kafkaConnected = readiness.consumerRunning;
   const healthy = elasticsearchConnected && kafkaConnected;

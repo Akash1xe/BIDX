@@ -7,7 +7,7 @@ async function healthCheck(req, res) {
   const mongodbConnected = db.isConnected;
   const kafkaConnected = publisher.isConnected;
 
-  const healthy = mongodbConnected && kafkaConnected;
+  const healthy = mongodbConnected && (env.demoMode || kafkaConnected);
   return ApiResponse.success(res, {
     statusCode: healthy ? 200 : 503,
     message: healthy ? "Service healthy" : "Service degraded",
@@ -16,7 +16,11 @@ async function healthCheck(req, res) {
       service: env.serviceName,
       uptimeSeconds: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
-      services: { mongodb: { connected: mongodbConnected }, kafka: { connected: kafkaConnected } }
+      mode: env.demoMode ? "demo" : "full",
+      services: {
+        mongodb: { connected: mongodbConnected },
+        kafka: { connected: kafkaConnected, disabled: env.demoMode }
+      }
     }
   });
 }

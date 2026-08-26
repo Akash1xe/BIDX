@@ -31,11 +31,15 @@ async function waitForElasticsearch() {
 async function main() {
   process.env.SERVICE_NAME = env.serviceName;
 
-  publisher
-    .init({ brokers: env.kafka.brokers, clientId: `${env.kafka.clientId}-producer` })
-    .catch(() => {
-      logger.warn("Kafka producer unavailable at startup, DLQ parking will fail until connected");
-    });
+  if (!env.demoMode) {
+    publisher
+      .init({ brokers: env.kafka.brokers, clientId: `${env.kafka.clientId}-producer` })
+      .catch(() => {
+        logger.warn("Kafka producer unavailable at startup, DLQ parking will fail until connected");
+      });
+  } else {
+    logger.info("Demo mode enabled: Elasticsearch and Kafka indexing are disabled");
+  }
 
   const indexer = new IndexerService(es.inner);
   const consumer = new AuctionIndexerConsumer(indexer);
@@ -46,7 +50,7 @@ async function main() {
   });
 
   // background bootstrap: ES index, then Kafka consumer
-  (async () => {
+  if (!env.demoMode) (async () => {
     if (!(await waitForElasticsearch())) {
       return;
     }

@@ -24,7 +24,7 @@ const env = {
   isProduction: nodeEnv === "production",
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "api-gateway",
-  port: parseInt(required("GATEWAY_PORT", "4000"), 10),
+  port: parseInt(process.env.PORT || required("GATEWAY_PORT", "4000"), 10),
   corsOrigins,
   authRefreshCookieName: process.env.AUTH_REFRESH_COOKIE_NAME || "bidx_refresh",
   jwt: { accessSecret: process.env.JWT_ACCESS_SECRET },

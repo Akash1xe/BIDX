@@ -24,10 +24,11 @@ async function healthCheck(req, res) {
       service: env.serviceName,
       uptimeSeconds: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
+      mode: env.demoMode ? "demo" : "full",
       services: {
         mongodb: { connected: mongodbConnected },
         redis: { connected: redisConnected },
-        kafka: { connected: kafkaConnected }
+        kafka: { connected: kafkaConnected, disabled: env.demoMode }
       }
     }
   });

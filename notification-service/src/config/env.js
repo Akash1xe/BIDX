@@ -1,6 +1,7 @@
 const env = {
-  port: Number(process.env.NOTIFICATION_SERVICE_PORT) || 4006,
+  port: Number(process.env.PORT || process.env.NOTIFICATION_SERVICE_PORT) || 4006,
   nodeEnv: process.env.NODE_ENV || "development",
+  demoMode: String(process.env.DEMO_MODE || "false").toLowerCase() === "true",
   mongo: {
     uri: process.env.MONGODB_URI_NOTIFICATIONS || "mongodb://localhost:27017/bidx_notifications"
   },

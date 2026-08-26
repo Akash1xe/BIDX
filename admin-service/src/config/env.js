@@ -1,5 +1,5 @@
 const env = {
-  port: Number(process.env.ADMIN_SERVICE_PORT) || 4007,
+  port: Number(process.env.PORT || process.env.ADMIN_SERVICE_PORT) || 4007,
   nodeEnv: process.env.NODE_ENV || "development",
   mongo: {
     admin: process.env.MONGODB_URI_ADMIN || "mongodb://localhost:27017/bidx_admin",

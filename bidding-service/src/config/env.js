@@ -16,9 +16,10 @@ function required(key, fallback) {
 const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   isProduction: process.env.NODE_ENV === "production",
+  demoMode: String(process.env.DEMO_MODE || "false").toLowerCase() === "true",
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "bidding-service",
-  port: parseInt(required("BIDDING_SERVICE_PORT", "4004"), 10),
+  port: parseInt(process.env.PORT || required("BIDDING_SERVICE_PORT", "4004"), 10),
   socketCorsOrigins: (process.env.CORS_ORIGINS || "*").split(",").map((value) => value.trim()),
   mongoUris: {
     bids: required("MONGODB_URI_BIDS", "mongodb://localhost:27017/bidx_bids"),

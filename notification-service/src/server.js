@@ -47,7 +47,11 @@ app.use(errorHandler);
 async function startServer() {
   await connect();
   notificationService.init();
-  await emailConsumer.start();
+  if (env.demoMode) {
+    logger.info("DEMO_MODE enabled: Kafka email events are disabled");
+  } else {
+    await emailConsumer.start();
+  }
   app.listen(env.port, () => {
     logger.info(`notification-service listening on port ${env.port} [${env.nodeEnv}] (email=${env.email.mode})`);
   });
@@ -60,7 +64,9 @@ startServer().catch((err) => {
 
 async function shutdown(signal) {
   logger.info(`${signal} received, shutting down`);
-  try { await emailConsumer.stop(); } catch {}
+  if (!env.demoMode) {
+    try { await emailConsumer.stop(); } catch {}
+  }
   process.exit(0);
 }
 process.on("SIGTERM", () => shutdown("SIGTERM"));

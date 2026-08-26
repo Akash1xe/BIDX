@@ -25,10 +25,11 @@ function required(key, fallback) {
 const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   isProduction: process.env.NODE_ENV === "production",
+  demoMode: String(process.env.DEMO_MODE || "false").toLowerCase() === "true",
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "auction-service",
 
-  port: parseInt(required("AUCTION_SERVICE_PORT", "4002"), 10),
+  port: parseInt(process.env.PORT || required("AUCTION_SERVICE_PORT", "4002"), 10),
 
   mongoUri: required("MONGODB_URI_AUCTIONS", "mongodb://localhost:27017/bidx_auctions"),
 

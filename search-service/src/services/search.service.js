@@ -21,6 +21,24 @@ function parseStatuses(raw) {
   return statuses.filter((s) => s !== "DRAFT");
 }
 
+function demoPrice(auction) {
+  return Number(auction.currentBid || auction.currentPrice || auction.startingPrice || 0);
+}
+
+function demoProduct(auction) {
+  return auction.product || auction;
+}
+
+function countFacet(items, readValue) {
+  const counts = new Map();
+  for (const item of items) {
+    const value = readValue(item);
+    if (!value) continue;
+    counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  return [...counts.entries()].map(([value, count]) => ({ value, count }));
+}
+
 class SearchService {
   constructor(es) {
     this.es = es;
@@ -31,7 +49,70 @@ class SearchService {
     }
   }
 
+  async fetchDemoAuctions() {
+    const baseUrl = env.auctionServiceUrl.replace(/\/api\/v1\/?$/, "");
+    let response;
+    try {
+      response = await fetch(`${baseUrl}/api/v1/auctions?page=1&limit=50`);
+    } catch (error) {
+      throw ApiError.serviceUnavailable(`Auction Service is unavailable: ${error.message}`);
+    }
+    if (!response.ok) {
+      throw ApiError.serviceUnavailable(`Auction Service returned HTTP ${response.status}`);
+    }
+    const payload = await response.json();
+    return Array.isArray(payload?.data?.items) ? payload.data.items : [];
+  }
+
+  async searchDemo(params) {
+    const page = Math.max(1, parseInt(params.page || "1", 10));
+    const limit = Math.min(50, Math.max(1, parseInt(params.limit || "20", 10)));
+    const q = String(params.q || "").trim().toLowerCase();
+    const statuses = parseStatuses(params.status);
+    const minPrice = params.minPrice === undefined || params.minPrice === "" ? null : Number(params.minPrice);
+    const maxPrice = params.maxPrice === undefined || params.maxPrice === "" ? null : Number(params.maxPrice);
+    if (Number.isNaN(minPrice) || Number.isNaN(maxPrice)) {
+      throw ApiError.badRequest("minPrice/maxPrice must be numbers");
+    }
+
+    let results = (await this.fetchDemoAuctions()).filter((auction) => {
+      const product = demoProduct(auction);
+      const text = `${product.name || ""} ${product.description || ""}`.toLowerCase();
+      if (q && !text.includes(q)) return false;
+      if (statuses?.length && !statuses.includes(auction.status)) return false;
+      if (!statuses?.length && auction.status === "DRAFT") return false;
+      if (params.category && String(product.category || "").toLowerCase() !== String(params.category).toLowerCase()) return false;
+      if (params.condition && product.condition !== params.condition) return false;
+      if (params.sellerId && String(auction.sellerId) !== String(params.sellerId)) return false;
+      const price = demoPrice(auction);
+      if (minPrice !== null && price < minPrice) return false;
+      if (maxPrice !== null && price > maxPrice) return false;
+      return true;
+    });
+
+    const sortKey = params.sort && SORTS[params.sort] ? params.sort : q ? "relevance" : "newest";
+    if (sortKey === "price_asc") results.sort((a, b) => demoPrice(a) - demoPrice(b));
+    if (sortKey === "price_desc") results.sort((a, b) => demoPrice(b) - demoPrice(a));
+    if (sortKey === "ending_soon") results.sort((a, b) => new Date(a.endTime) - new Date(b.endTime));
+    if (sortKey === "newest") results.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+
+    const total = results.length;
+    const from = (page - 1) * limit;
+    const pageResults = results.slice(from, from + limit);
+    return {
+      results: pageResults,
+      facets: {
+        categories: countFacet(results, (auction) => demoProduct(auction).category),
+        statuses: countFacet(results, (auction) => auction.status)
+      },
+      pagination: { page, limit, total },
+      sort: sortKey,
+      mode: "demo"
+    };
+  }
+
   async search(params) {
+    if (env.demoMode) return this.searchDemo(params);
     this.assertReady();
 
     const page = Math.max(1, parseInt(params.page || "1", 10));
@@ -124,6 +205,19 @@ class SearchService {
   }
 
   async suggest(query) {
+    if (env.demoMode) {
+      const q = String(query || "").trim().toLowerCase();
+      if (!q) return [];
+      const auctions = await this.fetchDemoAuctions();
+      return auctions
+        .filter((auction) => auction.status !== "DRAFT" && String(demoProduct(auction).name || "").toLowerCase().includes(q))
+        .slice(0, 8)
+        .map((auction) => ({
+          auctionId: auction.id || auction.auctionId,
+          name: demoProduct(auction).name,
+          category: demoProduct(auction).category
+        }));
+    }
     this.assertReady();
 
     const q = (query || "").trim();

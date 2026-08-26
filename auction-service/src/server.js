@@ -10,18 +10,24 @@ async function main() {
   process.env.SERVICE_NAME = env.serviceName;
   await db.connect(env.mongoUri);
 
-  publisher
-    .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
-    .catch(() => {
-      logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
-    });
+  if (!env.demoMode) {
+    publisher
+      .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
+      .catch(() => {
+        logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
+      });
+  } else {
+    logger.info("Demo mode enabled: Kafka producer and bid consumer are disabled");
+  }
 
   const bidConsumer = new BidConsumer();
   const scheduler = new CompletionScheduler();
 
-  await bidConsumer.start().catch((err) => {
-    logger.warn(`Bid consumer failed to start: ${err.message}`);
-  });
+  if (!env.demoMode) {
+    await bidConsumer.start().catch((err) => {
+      logger.warn(`Bid consumer failed to start: ${err.message}`);
+    });
+  }
   scheduler.start();
 
   const app = createApp();

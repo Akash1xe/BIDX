@@ -17,34 +17,42 @@ async function main() {
   await db.connect("bids", env.mongoUris.bids);
   await db.connect("auctions", env.mongoUris.auctions);
 
-  publisher
-    .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
-    .catch(() => {
-      logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
-    });
+  if (!env.demoMode) {
+    publisher
+      .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
+      .catch(() => {
+        logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
+      });
+  } else {
+    logger.info("Demo mode enabled: Kafka producer and saga consumer are disabled");
+  }
 
   const sagaService = new SagaService();
   const sagaConsumer = new SagaConsumer({ sagaService });
 
-  await sagaConsumer.start().catch((err) => {
-    logger.warn(`Saga consumer failed to start: ${err.message}`);
-  });
+  if (!env.demoMode) {
+    await sagaConsumer.start().catch((err) => {
+      logger.warn(`Saga consumer failed to start: ${err.message}`);
+    });
+  }
 
   let scanTimer = null;
   let scanning = false;
-  scanTimer = setInterval(async () => {
-    if (scanning) return;
-    scanning = true;
-    try {
-      await sagaService.scanExpired();
-    } catch (err) {
-      logger.error(`Saga deadline scan failed: ${err.message}`);
-    } finally {
-      scanning = false;
-    }
-  }, env.saga.scanIntervalMs);
-  scanTimer.unref();
-  logger.info(`Saga deadline scanner started (interval=${env.saga.scanIntervalMs}ms)`);
+  if (!env.demoMode) {
+    scanTimer = setInterval(async () => {
+      if (scanning) return;
+      scanning = true;
+      try {
+        await sagaService.scanExpired();
+      } catch (err) {
+        logger.error(`Saga deadline scan failed: ${err.message}`);
+      } finally {
+        scanning = false;
+      }
+    }, env.saga.scanIntervalMs);
+    scanTimer.unref();
+    logger.info(`Saga deadline scanner started (interval=${env.saga.scanIntervalMs}ms)`);
+  }
 
   const app = createApp();
   const server = app.listen(env.port, () => {

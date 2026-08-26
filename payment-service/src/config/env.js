@@ -29,10 +29,11 @@ const hasLiveKeys = Boolean(
 const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   isProduction: process.env.NODE_ENV === "production",
+  demoMode: String(process.env.DEMO_MODE || "false").toLowerCase() === "true",
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "payment-service",
 
-  port: parseInt(required("PAYMENT_SERVICE_PORT", "4005"), 10),
+  port: parseInt(process.env.PORT || required("PAYMENT_SERVICE_PORT", "4005"), 10),
 
   mongoUri: required("MONGODB_URI_PAYMENTS", "mongodb://localhost:27017/bidx_payments"),
 

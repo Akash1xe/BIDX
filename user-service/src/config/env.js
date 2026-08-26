@@ -23,14 +23,16 @@ function booleanValue(value, fallback) {
 
 const nodeEnv = process.env.NODE_ENV || "development";
 const isProduction = nodeEnv === "production";
+const demoMode = String(process.env.DEMO_MODE || "false").toLowerCase() === "true";
 const sameSite = (process.env.AUTH_REFRESH_COOKIE_SAME_SITE || "lax").toLowerCase();
 
 const env = {
   nodeEnv,
   isProduction,
+  demoMode,
   logLevel: process.env.LOG_LEVEL || "info",
   serviceName: process.env.SERVICE_NAME || "user-service",
-  port: parseInt(required("USER_SERVICE_PORT", "4001"), 10),
+  port: parseInt(process.env.PORT || required("USER_SERVICE_PORT", "4001"), 10),
   mongoUri: required("MONGODB_URI_USERS", "mongodb://localhost:27017/bidx_users"),
   redisUrl: required("REDIS_URL", "redis://localhost:6379"),
   jwt: {

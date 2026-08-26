@@ -9,16 +9,21 @@ async function main() {
   process.env.SERVICE_NAME = env.serviceName;
   await db.connect("payments", env.mongoUri);
 
-  publisher
-    .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
-    .catch(() => {
-      logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
-    });
+  let winnerConsumer = null;
+  if (env.demoMode) {
+    logger.info("DEMO_MODE enabled: Kafka payment events are disabled");
+  } else {
+    publisher
+      .init({ brokers: env.kafka.brokers, clientId: env.kafka.clientId })
+      .catch(() => {
+        logger.warn("Kafka unavailable at startup, events will be dropped until reconnected");
+      });
 
-  const winnerConsumer = new WinnerConsumer();
-  await winnerConsumer.start().catch((err) => {
-    logger.warn(`Winner consumer failed to start: ${err.message}`);
-  });
+    winnerConsumer = new WinnerConsumer();
+    await winnerConsumer.start().catch((err) => {
+      logger.warn(`Winner consumer failed to start: ${err.message}`);
+    });
+  }
 
   const app = createApp();
   const server = app.listen(env.port, () => {
@@ -34,8 +39,8 @@ async function main() {
     logger.info(`${signal} received, shutting down gracefully`);
     server.close(async () => {});
     try {
-      await winnerConsumer.stop();
-      await publisher.disconnect();
+      if (winnerConsumer) await winnerConsumer.stop();
+      if (!env.demoMode) await publisher.disconnect();
       await db.disconnect();
     } catch (err) {
       logger.error("Error during shutdown:", err.message);
