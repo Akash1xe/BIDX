@@ -107,3 +107,9 @@ test("demo payments resolve winners from the Auction Service and require no brow
   assert.match(frontend, /confirmPayment\.mutateAsync\(\{ orderId: order\.orderId \}\)/);
   assert.doesNotMatch(frontend, /does not expose a signed mock-confirmation endpoint/);
 });
+
+test("payment startup logs never include MongoDB credentials", async () => {
+  const db = await read("payment-service/src/config/db.js");
+  assert.match(db, /new URL\(uri\)\.host/);
+  assert.doesNotMatch(db, /uri\.split\("\/\/"\)\[1\]/);
+});

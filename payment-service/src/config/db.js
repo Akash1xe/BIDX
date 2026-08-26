@@ -19,7 +19,9 @@ class DbManager {
       .createConnection(uri, { serverSelectionTimeoutMS: 10000 })
       .asPromise();
     this.connections[name] = connection;
-    logger.info(`MongoDB [${name}] connected: ${uri.split("//")[1]}`);
+    let host = "configured host";
+    try { host = new URL(uri).host; } catch {}
+    logger.info(`MongoDB [${name}] connected: ${host}`);
     return connection;
   }
 
