@@ -16,11 +16,15 @@ const roleLinks = {
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/seller", label: "Seller studio", icon: Store },
+    { href: "/seller/products", label: "Products", icon: Store },
+    { href: "/seller/auctions", label: "Auctions", icon: Gavel },
   ],
   ADMIN: [
     { href: "/dashboard", label: "Buyer view", icon: UserRound },
     { href: "/dashboard/bids", label: "My bids", icon: Gavel },
     { href: "/seller", label: "Seller studio", icon: Store },
+    { href: "/seller/products", label: "Products", icon: Store },
+    { href: "/seller/auctions", label: "Auctions", icon: Gavel },
     { href: "/admin", label: "Admin", icon: ShieldCheck },
   ],
 };

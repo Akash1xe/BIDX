@@ -44,6 +44,17 @@ Phase 4 — Real-time bidding (complete):
 - auction and bid-history polling fallback while gateway WebSocket proxying is pending;
 - no optimistic bid success—the backend remains authoritative.
 
+Phase 5 — Seller workspace (complete):
+
+- seller dashboard driven by seller-filtered auction data;
+- product creation with exact Product Service validation and conditions;
+- returned product ID flows directly into draft auction creation;
+- seller auction list with pagination, pricing, timing, and status;
+- edit, start, end, view, and confirmed draft-deletion operations;
+- frontend ownership checks plus backend-authoritative write authorization;
+- accurate contract-gap state instead of a fabricated product inventory;
+- responsive forms, tables, loading, error, empty, and success states.
+
 ## Local setup
 
 ```bash
@@ -84,6 +95,7 @@ Read:
 - [Authentication architecture](docs/AUTHENTICATION.md)
 - [Marketplace architecture](docs/MARKETPLACE.md)
 - [Bidding architecture](docs/BIDDING.md)
+- [Seller workspace architecture](docs/SELLER.md)
 
 ## Important rule
 

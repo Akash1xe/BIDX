@@ -43,6 +43,10 @@ The planned seller products page needs something like:
 GET /api/v1/products?sellerId=<current-user>&page=1&limit=20
 ```
 
+Phase 5 therefore provides real product creation and carries the returned
+product ID directly into auction creation, but intentionally does not render a
+fabricated inventory list. The Products page explains the missing contract.
+
 ## 4. New users cannot become sellers through an API
 
 Signup creates role `USER`, and profile updates only allow `name`. No current
